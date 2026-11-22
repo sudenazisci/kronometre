@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALES Çalışma Kronometresi</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+</head>
+<body>
+
+  <!-- Background Decorative Flora and Particles -->
+  <div id="decorations-container"></div>
+
+  <!-- Layout Arrange Mode Active Alert -->
+  <div id="layout-mode-banner" class="layout-mode-banner">
+    <span>📐 <strong>Düzenleme Modu Aktif</strong>: Öğeleri sürükleyip taşıyabilir veya varsayılan yerleşimine döndürebilirsiniz.</span>
+    <button id="btn-reset-layout" class="btn-ctrl-secondary" style="padding: 4px 14px; font-size: 13px;">Varsayılan Düzene Dön</button>
+    <button id="btn-save-layout" class="btn-ctrl-primary" style="padding: 4px 14px; font-size: 13px;">Tamamla</button>
+  </div>
+
+  <div id="app">
+
+    <!-- Header Section -->
+    <header id="main-header" class="app-header" data-draggable-widget="header">
+      <div class="brand-section">
+        <div class="brand-flower-icon">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="14" fill="var(--accent-color, #e06f8b)" />
+            <circle cx="50" cy="24" r="14" fill="var(--deco-color-1, #f8b9c8)" opacity="0.85"/>
+            <circle cx="50" cy="76" r="14" fill="var(--deco-color-1, #f8b9c8)" opacity="0.85"/>
+            <circle cx="24" cy="50" r="14" fill="var(--deco-color-1, #f8b9c8)" opacity="0.85"/>
+            <circle cx="76" cy="50" r="14" fill="var(--deco-color-1, #f8b9c8)" opacity="0.85"/>
+            <circle cx="32" cy="32" r="13" fill="var(--deco-color-2, #eb93a8)" opacity="0.75"/>
+            <circle cx="68" cy="32" r="13" fill="var(--deco-color-2, #eb93a8)" opacity="0.75"/>
+            <circle cx="32" cy="68" r="13" fill="var(--deco-color-2, #eb93a8)" opacity="0.75"/>
+            <circle cx="68" cy="68" r="13" fill="var(--deco-color-2, #eb93a8)" opacity="0.75"/>
+            <circle cx="50" cy="50" r="7" fill="#fff" />
+          </svg>
+        </div>
+        <div class="brand-text-wrap">
+          <span id="app-title-display" class="app-title" style="display:none;"></span>
+          <span id="app-subtitle-display" class="app-subtitle">ALES Çalışma Alanı</span>
+        </div>
+      </div>
+
+      <!-- Live Clock & Date Section -->
+      <div id="header-time-date" class="header-clock-date" data-draggable-widget="clock-date">
+        <div class="live-clock">
+          <svg class="clock-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span id="live-clock-text">00:00:00</span>
+        </div>
+        <div id="live-date-text" class="live-date">Yükleniyor...</div>
+      </div>
+
+      <!-- Header Action Controls -->
+      <div class="header-actions">
+        <button id="btn-toggle-layout" class="header-btn" title="Düzenleme Modunu Aç/Kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Düzen</span>
+        </button>
+
+        <button id="btn-open-stats" class="header-btn" title="İstatistikler ve Çalışma Geçmişi (S)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 20V10"></path>
+            <path d="M12 20V4"></path>
+            <path d="M6 20v-6"></path>
+          </svg>
+          <span>İstatistikler</span>
+        </button>
+
+        <button id="btn-open-settings" class="header-btn" title="Kişiselleştirme ve Ayarlar (T)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Özelleştir</span>
+        </button>
+
+        <button id="btn-toggle-fullscreen" class="header-btn btn-fullscreen" title="Tam Ekran (F)">
+          <svg id="fullscreen-icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+          <svg id="fullscreen-icon-compress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:none;">
+            <path d="M4 14h6v6m10-10h-6V4m0 6l7-7M9 15l-7 7"></path>
+          </svg>
+          <span id="fullscreen-btn-text">Tam Ekran</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mode Switcher Tabs -->
+    <div class="mode-switcher-container">
+      <div class="mode-switcher-pill">
+        <button id="tab-mode-normal" class="mode-tab-btn active">
+          <span>⏱️ Normal Kronometre</span>
+        </button>
+        <button id="tab-mode-ales" class="mode-tab-btn">
+          <span>🎯 ALES Modu (150 dk)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Central Timer Stage -->
+      <div id="timer-stage" class="timer-stage-card" data-draggable-widget="timer">
+        
+        <!-- Subtle Active Indicator -->
+        <div id="study-status-indicator" class="study-status-indicator">
+          <span class="status-flower-dot"></span>
+          <span id="study-status-text">HAZIR</span>
+        </div>
+
+        <!-- ALES Progress Bar (Only visible in ALES mode) -->
+        <div id="ales-progress-container" class="ales-progress-container">
+          <div id="ales-progress-fill" class="ales-progress-fill"></div>
+        </div>
+
+        <!-- Big Timer Digits -->
+        <div class="timer-display-wrap">
+          <div id="timer-digits" class="timer-digits">00:00:00</div>
+        </div>
+
+        <div id="timer-target-tag" class="timer-target-tag" style="display: none;">
+          Hedef: 150 Dakika (2 sa 30 dk)
+        </div>
+
+        <!-- Timer Control Buttons -->
+        <div class="timer-controls">
+          <button id="btn-start" class="btn-ctrl btn-ctrl-primary">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="btn-start-text">Başlat</span>
+          </button>
+
+          <button id="btn-pause" class="btn-ctrl btn-ctrl-secondary" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+            <span>Duraklat</span>
+          </button>
+
+          <button id="btn-reset" class="btn-ctrl btn-ctrl-danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+            <span>Sıfırla</span>
+          </button>
+
+          <button id="btn-finish-ales" class="btn-ctrl btn-ctrl-secondary" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Sınavı Bitir</span>
+          </button>
+        </div>
+
+        <!-- Floating Exit Fullscreen Button (Shown in Fullscreen Only) -->
+        <button id="btn-fullscreen-floating-exit" class="btn-fullscreen-floating-exit" title="Küçült (ESC)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
+            <path d="M4 14h6v6m10-10h-6V4m0 6l7-7M9 15l-7 7"></path>
+          </svg>
+          <span>Küçült</span>
+        </button>
+      </div>
+
+    </main>
+
+    <!-- Mini Stats Bar (Always on main screen) -->
+    <footer id="mini-stats-container" class="mini-stats-bar" data-draggable-widget="mini-stats">
+      <div class="mini-stat-item">
+        <span class="stat-icon">📅</span>
+        <span class="stat-label">Bugün:</span>
+        <span id="mini-stat-today" class="stat-value">0 dk</span>
+      </div>
+      <div class="mini-stat-divider"></div>
+      <div class="mini-stat-item">
+        <span class="stat-icon">🌱</span>
+        <span class="stat-label">Genel Toplam:</span>
+        <span id="mini-stat-overall" class="stat-value">0 dk</span>
+      </div>
+      <div class="mini-stat-divider"></div>
+      <div class="mini-stat-item">
+        <span class="stat-icon">🎯</span>
+        <span class="stat-label">Bugünkü Oturum:</span>
+        <span id="mini-stat-sessions" class="stat-value">0</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Settings & Customization Drawer/Modal -->
+  <div id="settings-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span style="font-size: 24px;">🎨</span>
+          <h2 class="modal-title">Görünüm ve Özelleştirme</h2>
+        </div>
+        <button id="btn-close-settings" class="modal-close-btn" title="Kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="settings-layout">
+        <div class="settings-sidebar">
+          <button class="settings-tab-link active" data-tab="tab-themes">🌸 Temalar</button>
+          <button class="settings-tab-link" data-tab="tab-colors">🎨 Renkler</button>
+          <button class="settings-tab-link" data-tab="tab-fonts">✒️ Fontlar</button>
+          <button class="settings-tab-link" data-tab="tab-sizes">📏 Yazı Boyutları</button>
+          <button class="settings-tab-link" data-tab="tab-ales">🎯 Kronometre & ALES</button>
+          <button class="settings-tab-link" data-tab="tab-decorations">🌿 Dekorasyonlar</button>
+          <button class="settings-tab-link" data-tab="tab-layout">📐 Görünüm & Düzen</button>
+          <button class="settings-tab-link" data-tab="tab-shortcuts">⌨️ Kısayollar</button>
+          <button class="settings-tab-link" data-tab="tab-backup">💾 Yedekleme</button>
+        </div>
+
+        <div class="settings-content-area">
+          
+          <!-- 1. Temalar -->
+          <div id="tab-themes" class="settings-pane active">
+            <h3 class="settings-section-title">Hazır Temalar</h3>
+            <p class="settings-section-desc">Seçtiğin tema uygulamanın renklerini, fontunu, dekorasyonlarını ve havasını bütünüyle değiştirir.</p>
+            <div id="themes-grid" class="themes-grid"></div>
+          </div>
+
+          <!-- 2. Renkler -->
+          <div id="tab-colors" class="settings-pane">
+            <h3 class="settings-section-title">Renk Paletleri & Detaylı Renk Ayarı</h3>
+            <p class="settings-section-desc">Hazır bir palet seçebilir veya her bir rengi tek tek belirleyebilirsin.</p>
+            
+            <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-secondary);">HAZIR RENK PALETLERİ</h4>
+            <div id="palettes-container" class="palettes-row"></div>
+
+            <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-secondary);">ÖZEL RENK SEÇİCİLER</h4>
+            <div id="color-pickers-container" class="color-picker-grid"></div>
+          </div>
+
+          <!-- 3. Fontlar -->
+          <div id="tab-fonts" class="settings-pane">
+            <h3 class="settings-section-title">Font Tercihleri</h3>
+            <p class="settings-section-desc">Genel arayüz fontunu ve kronometre rakamlarının fontunu ayrı ayrı seçebilirsin.</p>
+            
+            <div class="setting-row-control">
+              <label class="setting-row-label">Genel Uygulama Fontu</label>
+              <select id="select-main-font" class="select-input" style="margin-top: 8px;"></select>
+            </div>
+
+            <div class="setting-row-control">
+              <label class="setting-row-label">Kronometre Rakamları Fontu</label>
+              <select id="select-timer-font" class="select-input" style="margin-top: 8px;"></select>
+            </div>
+          </div>
+
+          <!-- 4. Yazı Boyutları -->
+          <div id="tab-sizes" class="settings-pane">
+            <h3 class="settings-section-title">Yazı Boyutları</h3>
+            <p class="settings-section-desc">Kronometreyi devasa büyütebilir veya diğer metin boyutlarını dilediğince ayarlayabilirsin.</p>
+            <div id="font-sizes-container"></div>
+          </div>
+
+          <!-- 5. Kronometre & ALES -->
+          <div id="tab-ales" class="settings-pane">
+            <h3 class="settings-section-title">ALES ve Kronometre Seçenekleri</h3>
+            <p class="settings-section-desc">Sınav deneme sürelerini, sesli uyarıları ve tam ekran davranışını özelleştir.</p>
+
+            <div class="setting-row-control">
+              <label class="setting-row-label">ALES Modu Deneme Süresi</label>
+              <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                <button class="palette-preset-pill btn-ales-preset" data-minutes="150">🎯 150 dk (Standart ALES)</button>
+                <button class="palette-preset-pill btn-ales-preset" data-minutes="120">⏱️ 120 dk (2 Saat)</button>
+                <button class="palette-preset-pill btn-ales-preset" data-minutes="90">⏱️ 90 dk (1.5 Saat)</button>
+              </div>
+              <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; font-weight: 600;">Özel Süre (dakika):</span>
+                <input type="number" id="input-custom-ales-min" class="text-input" style="width: 100px;" min="1" max="600" value="150">
+              </div>
+            </div>
+
+            <div class="switch-row">
+              <div class="switch-label-wrap">
+                <span class="switch-title">Süre Bittiğinde Sesli Melodi Çal</span>
+                <span class="switch-subtitle">ALES süresi dolduğunda huzurlu bir arp melodisi çalar</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-sound-chime" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+              <button id="btn-test-chime" class="btn-ctrl-secondary" style="padding: 6px 16px; font-size: 13px;">🔔 Melodiyi Test Et</button>
+            </div>
+
+            <div class="switch-row" style="margin-top: 14px;">
+              <div class="switch-label-wrap">
+                <span class="switch-title">Tam Ekranda Minimal Odak Modu</span>
+                <span class="switch-subtitle">Tam ekrana geçildiğinde gereksiz detayları otomatik olarak şeffaflaştırır</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-focus-mode">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 6. Dekorasyonlar -->
+          <div id="tab-decorations" class="settings-pane">
+            <h3 class="settings-section-title">Doğal Çiçek ve Dekorasyon Ayarları</h3>
+            <p class="settings-section-desc">Ekranda beliren papatyaları, kiraz çiçeklerini, kelebekleri ve yaprakları kişiselleştir.</p>
+
+            <div class="switch-row">
+              <div class="switch-label-wrap">
+                <span class="switch-title">Tüm Dekorasyonları Göster</span>
+                <span class="switch-subtitle">Çiçekleri, yaprakları ve parıltıları aç veya kapat</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-all-decorations" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="switch-row">
+              <div class="switch-label-wrap">
+                <span class="switch-title">Hafif ve Sakin Animasyonlar</span>
+                <span class="switch-subtitle">Dikkati dağıtmayan yumuşak salınım ve süzülme hareketleri</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-deco-animations" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row-control">
+              <div class="setting-row-header">
+                <span class="setting-row-label">Dekorasyon Boyutu</span>
+                <span id="label-deco-scale" class="setting-row-val">%100</span>
+              </div>
+              <input type="range" id="slider-deco-scale" class="range-slider" min="50" max="180" value="100">
+            </div>
+
+            <div class="setting-row-control">
+              <div class="setting-row-header">
+                <span class="setting-row-label">Animasyon Hızı</span>
+                <span id="label-deco-speed" class="setting-row-val">1.0x</span>
+              </div>
+              <input type="range" id="slider-deco-speed" class="range-slider" min="0.3" max="2.0" step="0.1" value="1.0">
+            </div>
+          </div>
+
+          <!-- 7. Görünüm & Düzen -->
+          <div id="tab-layout" class="settings-pane">
+            <h3 class="settings-section-title">Görünürlük ve Başlık</h3>
+            <p class="settings-section-desc">Ekranda hangi öğelerin bulunacağını belirle ve uygulama adını özelleştir.</p>
+
+            <div class="setting-row-control">
+              <label class="setting-row-label">Uygulama Adı</label>
+              <input type="text" id="input-app-name" class="text-input" style="margin-top: 8px;" value="Study Bloom">
+            </div>
+
+            <div class="setting-row-control">
+              <label class="setting-row-label">Alt Başlık</label>
+              <input type="text" id="input-app-subtitle" class="text-input" style="margin-top: 8px;" value="ALES Çalışma Alanı">
+            </div>
+
+            <div class="switch-row">
+              <div class="switch-label-wrap">
+                <span class="switch-title">Canlı Saat ve Tarih</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-vis-clock" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="switch-row">
+              <div class="switch-label-wrap">
+                <span class="switch-title">Ana Ekrandaki Mini İstatistikler</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-vis-stats" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 8. Kısayollar -->
+          <div id="tab-shortcuts" class="settings-pane">
+            <h3 class="settings-section-title">Klavye Kısayolları</h3>
+            <p class="settings-section-desc">Çalışırken klavyenden elini kaldırmadan uygulamayı yönetebilirsin.</p>
+
+            <div class="switch-row">
+              <div class="switch-label-wrap">
+                <span class="switch-title">Klavye Kısayollarını Etkinleştir</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-enable-shortcuts" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px;">
+              <div class="color-input-item">
+                <span class="color-input-label">Kronometreyi Başlat / Duraklat</span>
+                <kbd style="padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;">Space (Boşluk)</kbd>
+              </div>
+              <div class="color-input-item">
+                <span class="color-input-label">Kronometreyi Sıfırla</span>
+                <kbd style="padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;">R</kbd>
+              </div>
+              <div class="color-input-item">
+                <span class="color-input-label">Tam Ekran Aç / Kapat</span>
+                <kbd style="padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;">F</kbd>
+              </div>
+              <div class="color-input-item">
+                <span class="color-input-label">Tam Ekrandan Çık / Modalı Kapat</span>
+                <kbd style="padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;">ESC</kbd>
+              </div>
+              <div class="color-input-item">
+                <span class="color-input-label">Özelleştirme Panelini Aç</span>
+                <kbd style="padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;">T</kbd>
+              </div>
+              <div class="color-input-item">
+                <span class="color-input-label">İstatistikler Panelini Aç</span>
+                <kbd style="padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;">S</kbd>
+              </div>
+            </div>
+          </div>
+
+          <!-- 10. Yedekleme & Sıfırlama -->
+          <div id="tab-backup" class="settings-pane">
+            <h3 class="settings-section-title">Yedekleme, İçe Aktar ve Sıfırla</h3>
+            <p class="settings-section-desc">Kişiselleştirdiğin temaları, ayarları ve tüm çalışma geçmişini JSON olarak dışa aktarabilirsin.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <button id="btn-export-backup" class="btn-ctrl-primary" style="justify-content: flex-start;">
+                📥 Ayarları ve Çalışma Geçmişini Dışa Aktar (JSON)
+              </button>
+
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="file" id="input-import-backup" accept=".json" style="display: none;">
+                <button id="btn-trigger-import" class="btn-ctrl-secondary" style="flex: 1; justify-content: flex-start;">
+                  📤 Yedek Dosyası Yükle (İçe Aktar)
+                </button>
+              </div>
+
+              <hr style="border: none; border-top: 1px solid var(--border-color); margin: 10px 0;">
+
+              <button id="btn-reset-defaults" class="btn-ctrl-danger" style="justify-content: flex-start;">
+                ⚠️ Tüm Ayarları Varsayılana Döndür
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics & History Modal -->
+  <div id="stats-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 900px;">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span style="font-size: 24px;">📊</span>
+          <h2 class="modal-title">Çalışma İstatistikleri & Geçmiş</h2>
+        </div>
+        <button id="btn-close-stats" class="modal-close-btn" title="Kapat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div style="padding: 16px 28px 0 28px; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px;">
+        <button id="tab-btn-stats-overview" class="mode-tab-btn active" style="padding: 8px 18px; font-size: 14px;">Genel İstatistikler</button>
+        <button id="tab-btn-stats-history" class="mode-tab-btn" style="padding: 8px 18px; font-size: 14px;">Çalışma Geçmişi</button>
+      </div>
+
+      <div style="padding: 24px 28px; max-height: 540px; overflow-y: auto;">
+        
+        <!-- Overview Pane -->
+        <div id="pane-stats-overview">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px;">
+            <div class="setting-row-control" style="margin: 0;">
+              <span style="font-size: 13px; color: var(--text-secondary);">Bugünkü Toplam</span>
+              <div id="stat-today-big" style="font-size: 26px; font-weight: 800; color: var(--accent-color); margin-top: 4px;">0 dk</div>
+              <span id="stat-today-sessions-count" style="font-size: 12px; color: var(--text-muted);">0 oturum</span>
+            </div>
+
+            <div class="setting-row-control" style="margin: 0;">
+              <span style="font-size: 13px; color: var(--text-secondary);">Genel Toplam Çalışma</span>
+              <div id="stat-overall-big" style="font-size: 26px; font-weight: 800; color: var(--timer-color); margin-top: 4px;">0 dk</div>
+              <span id="stat-overall-days-count" style="font-size: 12px; color: var(--text-muted);">0 aktif gün</span>
+            </div>
+
+            <div class="setting-row-control" style="margin: 0;">
+              <span style="font-size: 13px; color: var(--text-secondary);">En Verimli Gün</span>
+              <div id="stat-longest-day" style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 6px;">-</div>
+              <span id="stat-weekly-total-text" style="font-size: 12px; color: var(--text-muted);">Bu hafta toplam: 0 dk</span>
+            </div>
+          </div>
+
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 10px;">Son 7 Günlük Çalışma Dağılımı</h3>
+          <div id="weekly-chart-box"></div>
+        </div>
+
+        <!-- History Pane -->
+        <div id="pane-stats-history" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; gap: 8px;">
+              <button class="palette-preset-pill history-filter-btn active" data-filter="all">Tümü</button>
+              <button class="palette-preset-pill history-filter-btn" data-filter="normal">Normal</button>
+              <button class="palette-preset-pill history-filter-btn" data-filter="ales">ALES</button>
+            </div>
+            <button id="btn-clear-all-history" class="btn-ctrl-danger" style="padding: 6px 14px; font-size: 12px;">Geçmişi Temizle</button>
+          </div>
+
+          <div id="history-list-box"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Confirmation Dialog -->
+  <div id="reset-confirm-modal" class="modal-overlay">
+    <div class="modal-card dialog-box">
+      <div class="dialog-icon">🌸</div>
+      <h3 class="dialog-title">Kronometreyi Sıfırlamak İstiyor musun?</h3>
+      <p id="reset-dialog-desc" class="dialog-desc">Mevcut çalışma süren sıfırlanacak. Bu süreyi geçmişine kaydetmek ister misin?</p>
+      <div class="dialog-actions">
+        <button id="btn-dialog-save-reset" class="btn-ctrl btn-ctrl-primary" style="padding: 10px 20px; font-size: 14px;">Kaydet & Sıfırla</button>
+        <button id="btn-dialog-discard-reset" class="btn-ctrl btn-ctrl-danger" style="padding: 10px 20px; font-size: 14px;">Kaydetmeden Sıfırla</button>
+        <button id="btn-dialog-cancel" class="btn-ctrl btn-ctrl-secondary" style="padding: 10px 20px; font-size: 14px;">İptal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALES Completion Celebration Modal -->
+  <div id="ales-complete-modal" class="modal-overlay">
+    <div class="modal-card dialog-box">
+      <div class="dialog-icon">🎉</div>
+      <h3 class="dialog-title">Tebrikler! ALES Oturumu Tamamlandı!</h3>
+      <p class="dialog-desc">150 dakikalık deneme sınavı süren sona erdi. Büyük bir kararlılıkla çalıştın! Bu oturum geçmişine kaydedildi.</p>
+      <div class="dialog-actions">
+        <button id="btn-ales-celebrate-close" class="btn-ctrl btn-ctrl-primary" style="padding: 12px 30px; font-size: 15px;">Harika, Teşekkürler!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/decorations.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

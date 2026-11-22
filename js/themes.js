@@ -1,0 +1,504 @@
+// Study Bloom - Theme Definitions and Color Palettes
+
+const THEMES = {
+  'cherry-blossom': {
+    id: 'cherry-blossom',
+    name: 'Cherry Blossom',
+    description: 'Pudra pembe, açık krem, kiraz çiçekleri ve zarif taç yapraklar',
+    decoType: 'cherry',
+    colors: {
+      bgPrimary: '#fcf4f6',
+      bgSecondary: '#fae8ec',
+      bgCard: '#ffffff',
+      textPrimary: '#4a363f',
+      textSecondary: '#8a6572',
+      textMuted: '#bda1ab',
+      timerColor: '#b84d6c',
+      accentColor: '#e06f8b',
+      accentHover: '#c75370',
+      btnBg: '#e06f8b',
+      btnText: '#ffffff',
+      decoColor1: '#f8b9c8',
+      decoColor2: '#eb93a8',
+      borderColor: '#f2d3dc'
+    },
+    fontFamily: "'Quicksand', sans-serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '24px',
+    isDark: false
+  },
+  'daisy-garden': {
+    id: 'daisy-garden',
+    name: 'Daisy Garden',
+    description: 'Papatyalar, taze sarı detaylar, adaçayı yeşili ve sıcak krem',
+    decoType: 'daisy',
+    colors: {
+      bgPrimary: '#faf8f0',
+      bgSecondary: '#f3eedc',
+      bgCard: '#ffffff',
+      textPrimary: '#383e2b',
+      textSecondary: '#636c50',
+      textMuted: '#9aa386',
+      timerColor: '#cc8b14',
+      accentColor: '#e5a924',
+      accentHover: '#c99116',
+      btnBg: '#e5a924',
+      btnText: '#ffffff',
+      decoColor1: '#f5d365',
+      decoColor2: '#8fae7a',
+      borderColor: '#e8e2cd'
+    },
+    fontFamily: "'Nunito', sans-serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '24px',
+    isDark: false
+  },
+  'butterfly': {
+    id: 'butterfly',
+    name: 'Butterfly',
+    description: 'Pastel mavi, tatlı lila tonları ve süzülen kelebekler',
+    decoType: 'butterfly',
+    colors: {
+      bgPrimary: '#f3f5fd',
+      bgSecondary: '#e6ebfc',
+      bgCard: '#ffffff',
+      textPrimary: '#333b5a',
+      textSecondary: '#606b94',
+      textMuted: '#97a1cc',
+      timerColor: '#6366f1',
+      accentColor: '#7c86f8',
+      accentHover: '#5e68ec',
+      btnBg: '#7c86f8',
+      btnText: '#ffffff',
+      decoColor1: '#a5b4fc',
+      decoColor2: '#c4b5fd',
+      borderColor: '#dde3fa'
+    },
+    fontFamily: "'Quicksand', sans-serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '24px',
+    isDark: false
+  },
+  'strawberry': {
+    id: 'strawberry',
+    name: 'Strawberry',
+    description: 'Çilek desenleri, tatlı kırmızı ve pembe tonları, taze meyve neşesi',
+    decoType: 'strawberry',
+    colors: {
+      bgPrimary: '#fff4f4',
+      bgSecondary: '#ffe5e5',
+      bgCard: '#ffffff',
+      textPrimary: '#4d2b2b',
+      textSecondary: '#855151',
+      textMuted: '#bf8686',
+      timerColor: '#d63031',
+      accentColor: '#e84142',
+      accentHover: '#c22324',
+      btnBg: '#e84142',
+      btnText: '#ffffff',
+      decoColor1: '#ff7675',
+      decoColor2: '#55efc4',
+      borderColor: '#fed1d1'
+    },
+    fontFamily: "'Quicksand', sans-serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '24px',
+    isDark: false
+  },
+  'tulip-spring': {
+    id: 'tulip-spring',
+    name: 'Tulip Spring',
+    description: 'Lila, pastel pembe, bahar laleleri ve taze açan çiçekler',
+    decoType: 'tulip',
+    colors: {
+      bgPrimary: '#f8f4fc',
+      bgSecondary: '#f0e6f7',
+      bgCard: '#ffffff',
+      textPrimary: '#3f304f',
+      textSecondary: '#715887',
+      textMuted: '#a58cb9',
+      timerColor: '#9333ea',
+      accentColor: '#a855f7',
+      accentHover: '#8b2ee6',
+      btnBg: '#a855f7',
+      btnText: '#ffffff',
+      decoColor1: '#d8b4fe',
+      decoColor2: '#f472b6',
+      borderColor: '#e8d5f5'
+    },
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '24px',
+    isDark: false
+  },
+  'botanical': {
+    id: 'botanical',
+    name: 'Botanical',
+    description: 'Adaçayı yeşili, okaliptüs yaprakları ve huzurlu doğal tonlar',
+    decoType: 'botanical',
+    colors: {
+      bgPrimary: '#f2f6f3',
+      bgSecondary: '#e4eee7',
+      bgCard: '#ffffff',
+      textPrimary: '#263b2f',
+      textSecondary: '#4c6857',
+      textMuted: '#7f9c8a',
+      timerColor: '#366948',
+      accentColor: '#4f8a65',
+      accentHover: '#386f4d',
+      btnBg: '#4f8a65',
+      btnText: '#ffffff',
+      decoColor1: '#8ebf9f',
+      decoColor2: '#b8d8c2',
+      borderColor: '#d0e2d6'
+    },
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '24px',
+    isDark: false
+  },
+  'night-study': {
+    id: 'night-study',
+    name: 'Night Study',
+    description: 'Koyu lacivert, derin gece moru, parıldayan yıldızlar ve hilal',
+    decoType: 'stars',
+    colors: {
+      bgPrimary: '#0f1424',
+      bgSecondary: '#191f36',
+      bgCard: '#1d243e',
+      textPrimary: '#f1f5f9',
+      textSecondary: '#cbd5e1',
+      textMuted: '#64748b',
+      timerColor: '#c084fc',
+      accentColor: '#a855f7',
+      accentHover: '#c084fc',
+      btnBg: '#8b5cf6',
+      btnText: '#ffffff',
+      decoColor1: '#fbbf24',
+      decoColor2: '#818cf8',
+      borderColor: '#2e385e'
+    },
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '24px',
+    isDark: true
+  },
+  'cloudy-dream': {
+    id: 'cloudy-dream',
+    name: 'Cloudy Dream',
+    description: 'Pofuduk bulutlar, gökyüzü mavisi ve rüya gibi dingin atmosfer',
+    decoType: 'clouds',
+    colors: {
+      bgPrimary: '#f0f7fc',
+      bgSecondary: '#e1eff9',
+      bgCard: '#ffffff',
+      textPrimary: '#29435c',
+      textSecondary: '#4d6f8f',
+      textMuted: '#8ba6bf',
+      timerColor: '#0284c7',
+      accentColor: '#38bdf8',
+      accentHover: '#0ea5e9',
+      btnBg: '#0ea5e9',
+      btnText: '#ffffff',
+      decoColor1: '#bae6fd',
+      decoColor2: '#93c5fd',
+      borderColor: '#d2e7f6'
+    },
+    fontFamily: "'Quicksand', sans-serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '24px',
+    isDark: false
+  },
+  'dark-academia': {
+    id: 'dark-academia',
+    name: 'Dark Academia',
+    description: 'Kahve, deri ciltli kitaplar, vintage krem ve kütüphane esintisi',
+    decoType: 'books',
+    colors: {
+      bgPrimary: '#f5efe6',
+      bgSecondary: '#e8decb',
+      bgCard: '#fcfaf7',
+      textPrimary: '#3c2a21',
+      textSecondary: '#634832',
+      textMuted: '#967259',
+      timerColor: '#78350f',
+      accentColor: '#8c4b26',
+      accentHover: '#6a3416',
+      btnBg: '#8c4b26',
+      btnText: '#fbf8f3',
+      decoColor1: '#c79d6b',
+      decoColor2: '#8b5a2b',
+      borderColor: '#dbcaa9'
+    },
+    fontFamily: "'Playfair Display', serif",
+    timerFontFamily: "'Space Mono', monospace",
+    cardRadius: '18px',
+    isDark: false
+  },
+  'minimal': {
+    id: 'minimal',
+    name: 'Minimal',
+    description: 'Dekorasyonsuz, son derece sade, modern ve dikkati dağıtmayan tasarım',
+    decoType: 'none',
+    colors: {
+      bgPrimary: '#f8fafc',
+      bgSecondary: '#edf2f7',
+      bgCard: '#ffffff',
+      textPrimary: '#0f172a',
+      textSecondary: '#475569',
+      textMuted: '#94a3b8',
+      timerColor: '#0f172a',
+      accentColor: '#2563eb',
+      accentHover: '#1d4ed8',
+      btnBg: '#0f172a',
+      btnText: '#ffffff',
+      decoColor1: 'transparent',
+      decoColor2: 'transparent',
+      borderColor: '#e2e8f0'
+    },
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    timerFontFamily: "'Inter', sans-serif",
+    cardRadius: '16px',
+    isDark: false
+  }
+};
+
+const COLOR_PALETTES = [
+  {
+    id: 'pastel-pink',
+    name: 'Pastel Pembe',
+    preview: '#f8b4c4',
+    colors: {
+      bgPrimary: '#fff0f3',
+      bgSecondary: '#ffe3e8',
+      bgCard: '#ffffff',
+      textPrimary: '#4f3039',
+      textSecondary: '#855663',
+      textMuted: '#ba8c99',
+      timerColor: '#b84d6c',
+      accentColor: '#d87093',
+      btnBg: '#d87093',
+      btnText: '#ffffff',
+      decoColor1: '#ffccd5',
+      decoColor2: '#ff85a2',
+      borderColor: '#ffd0d9'
+    }
+  },
+  {
+    id: 'cherry-blossom-pal',
+    name: 'Cherry Blossom',
+    preview: '#e06f8b',
+    colors: THEMES['cherry-blossom'].colors
+  },
+  {
+    id: 'daisy-yellow',
+    name: 'Papatya Sarısı',
+    preview: '#f5d365',
+    colors: {
+      bgPrimary: '#fffdf5',
+      bgSecondary: '#fdf6db',
+      bgCard: '#ffffff',
+      textPrimary: '#423714',
+      textSecondary: '#7a6a35',
+      textMuted: '#b09f6b',
+      timerColor: '#d97706',
+      accentColor: '#f59e0b',
+      btnBg: '#f59e0b',
+      btnText: '#ffffff',
+      decoColor1: '#fde68a',
+      decoColor2: '#fef3c7',
+      borderColor: '#fce7a4'
+    }
+  },
+  {
+    id: 'lavender',
+    name: 'Lavanta',
+    preview: '#c084fc',
+    colors: {
+      bgPrimary: '#faf5ff',
+      bgSecondary: '#f3e8ff',
+      bgCard: '#ffffff',
+      textPrimary: '#3b2054',
+      textSecondary: '#6e4499',
+      textMuted: '#a37ec9',
+      timerColor: '#7e22ce',
+      accentColor: '#9333ea',
+      btnBg: '#9333ea',
+      btnText: '#ffffff',
+      decoColor1: '#d8b4fe',
+      decoColor2: '#c084fc',
+      borderColor: '#ebd5fc'
+    }
+  },
+  {
+    id: 'sage-green',
+    name: 'Sage Green',
+    preview: '#8ebf9f',
+    colors: {
+      bgPrimary: '#f3f6f4',
+      bgSecondary: '#e3ebe5',
+      bgCard: '#ffffff',
+      textPrimary: '#23382b',
+      textSecondary: '#4b6955',
+      textMuted: '#7c9985',
+      timerColor: '#2d6a4f',
+      accentColor: '#40916c',
+      btnBg: '#40916c',
+      btnText: '#ffffff',
+      decoColor1: '#95d5b2',
+      decoColor2: '#74c69d',
+      borderColor: '#cee0d4'
+    }
+  },
+  {
+    id: 'baby-blue',
+    name: 'Baby Blue',
+    preview: '#93c5fd',
+    colors: {
+      bgPrimary: '#f0f7ff',
+      bgSecondary: '#e0effe',
+      bgCard: '#ffffff',
+      textPrimary: '#1e3a5f',
+      textSecondary: '#436b9c',
+      textMuted: '#7da4d4',
+      timerColor: '#1d4ed8',
+      accentColor: '#3b82f6',
+      btnBg: '#3b82f6',
+      btnText: '#ffffff',
+      decoColor1: '#bfdbfe',
+      decoColor2: '#60a5fa',
+      borderColor: '#cfe4fc'
+    }
+  },
+  {
+    id: 'peach',
+    name: 'Peach',
+    preview: '#ffb5a7',
+    colors: {
+      bgPrimary: '#fff8f6',
+      bgSecondary: '#fdeee9',
+      bgCard: '#ffffff',
+      textPrimary: '#4d2b24',
+      textSecondary: '#855247',
+      textMuted: '#ba857b',
+      timerColor: '#ea580c',
+      accentColor: '#f97316',
+      btnBg: '#f97316',
+      btnText: '#ffffff',
+      decoColor1: '#fecdd3',
+      decoColor2: '#fed7aa',
+      borderColor: '#fedcd2'
+    }
+  },
+  {
+    id: 'strawberry-pal',
+    name: 'Strawberry',
+    preview: '#ff7675',
+    colors: THEMES['strawberry'].colors
+  },
+  {
+    id: 'cream-brown',
+    name: 'Cream & Brown',
+    preview: '#d4a373',
+    colors: {
+      bgPrimary: '#fefae0',
+      bgSecondary: '#faedcd',
+      bgCard: '#ffffff',
+      textPrimary: '#3d2b1f',
+      textSecondary: '#69513d',
+      textMuted: '#9e8067',
+      timerColor: '#b45309',
+      accentColor: '#d4a373',
+      btnBg: '#b47846',
+      btnText: '#ffffff',
+      decoColor1: '#e9edc9',
+      decoColor2: '#ccd5ae',
+      borderColor: '#eddeb9'
+    }
+  },
+  {
+    id: 'dark-academia-pal',
+    name: 'Dark Academia',
+    preview: '#8c4b26',
+    colors: THEMES['dark-academia'].colors
+  },
+  {
+    id: 'gece-moru',
+    name: 'Gece Moru',
+    preview: '#7928ca',
+    colors: {
+      bgPrimary: '#120722',
+      bgSecondary: '#1e0d36',
+      bgCard: '#271245',
+      textPrimary: '#f3e8ff',
+      textSecondary: '#d8b4fe',
+      textMuted: '#8b69b0',
+      timerColor: '#e879f9',
+      accentColor: '#c084fc',
+      btnBg: '#9333ea',
+      btnText: '#ffffff',
+      decoColor1: '#f0abfc',
+      decoColor2: '#a855f7',
+      borderColor: '#3b1c66'
+    }
+  },
+  {
+    id: 'midnight-blue',
+    name: 'Midnight Blue',
+    preview: '#1e293b',
+    colors: {
+      bgPrimary: '#0b1120',
+      bgSecondary: '#131e36',
+      bgCard: '#1a2744',
+      textPrimary: '#e2e8f0',
+      textSecondary: '#94a3b8',
+      textMuted: '#64748b',
+      timerColor: '#38bdf8',
+      accentColor: '#0ea5e9',
+      btnBg: '#0284c7',
+      btnText: '#ffffff',
+      decoColor1: '#7dd3fc',
+      decoColor2: '#38bdf8',
+      borderColor: '#25355a'
+    }
+  },
+  {
+    id: 'monochrome',
+    name: 'Monochrome',
+    preview: '#475569',
+    colors: {
+      bgPrimary: '#fafafa',
+      bgSecondary: '#f0f0f0',
+      bgCard: '#ffffff',
+      textPrimary: '#171717',
+      textSecondary: '#525252',
+      textMuted: '#a3a3a3',
+      timerColor: '#171717',
+      accentColor: '#404040',
+      btnBg: '#262626',
+      btnText: '#ffffff',
+      decoColor1: '#d4d4d4',
+      decoColor2: '#a3a3a3',
+      borderColor: '#e5e5e5'
+    }
+  }
+];
+
+const FONTS = [
+  { id: 'quicksand', name: 'Quicksand (Rounded Sevimli)', family: "'Quicksand', sans-serif", category: 'rounded' },
+  { id: 'nunito', name: 'Nunito (Yumuşak & Sıcak)', family: "'Nunito', sans-serif", category: 'rounded' },
+  { id: 'jakarta', name: 'Plus Jakarta Sans (Modern Temiz)', family: "'Plus Jakarta Sans', sans-serif", category: 'sans' },
+  { id: 'inter', name: 'Inter (Klasik Modern)', family: "'Inter', sans-serif", category: 'sans' },
+  { id: 'playfair', name: 'Playfair Display (Zarif Serif)', family: "'Playfair Display', serif", category: 'serif' },
+  { id: 'cormorant', name: 'Cormorant Garamond (Klasik Kitap)', family: "'Cormorant Garamond', serif", category: 'serif' },
+  { id: 'spacemono', name: 'Space Mono (Daktilo / Kod)', family: "'Space Mono', monospace", category: 'mono' },
+  { id: 'jetbrains', name: 'JetBrains Mono (Modern Daktilo)', family: "'JetBrains Mono', monospace", category: 'mono' },
+  { id: 'orbitron', name: 'Orbitron (Minimal Dijital)', family: "'Orbitron', sans-serif", category: 'digital' },
+  { id: 'sharetech', name: 'Share Tech Mono (Dijital Saat)', family: "'Share Tech Mono', monospace", category: 'digital' },
+  { id: 'caveat', name: 'Caveat (El Yazısı / Soft Handwritten)', family: "'Caveat', cursive", category: 'handwritten' },
+  { id: 'patrick', name: 'Patrick Hand (Sevimli Not Yazısı)', family: "'Patrick Hand', cursive", category: 'handwritten' }
+];
+
+window.THEMES = THEMES;
+window.COLOR_PALETTES = COLOR_PALETTES;
+window.FONTS = FONTS;
