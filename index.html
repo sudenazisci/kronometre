@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ALES Çalışma Kronometresi</title>
+  <title>Kronometre</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
 </head>
@@ -39,8 +39,8 @@
           </svg>
         </div>
         <div class="brand-text-wrap">
-          <span id="app-title-display" class="app-title" style="display:none;"></span>
-          <span id="app-subtitle-display" class="app-subtitle">Kişisel Sınav & Çalışma Alanı</span>
+          <span id="app-title-display" class="app-title">Kronometre</span>
+          <span id="app-subtitle-display" class="app-subtitle" style="display:none;"></span>
         </div>
       </div>
 
@@ -268,25 +268,38 @@
 
   </div>
 
-  <!-- Large Analog Clock Modal (Büyütülmüş Analog Saat) -->
+  <!-- Large Clock Modal (Büyük Saat Ekranı: Analog & Dijital) -->
   <div id="analog-clock-modal" class="modal-overlay">
-    <div class="modal-card analog-modal-card">
-      <div class="modal-header">
-        <div class="modal-title-wrap">
-          <span style="font-size: 24px;">🕰️</span>
-          <h2 class="modal-title">Canlı Analog Saat</h2>
+    <div class="modal-card clock-view-modal-card">
+      <div class="modal-header clock-modal-header">
+        <div class="clock-type-tabs">
+          <button type="button" id="tab-clock-analog" class="clock-view-tab-btn active" title="Analog Saat">
+            <span>🕰️ Analog</span>
+          </button>
+          <button type="button" id="tab-clock-digital" class="clock-view-tab-btn" title="Dijital Saat">
+            <span>⏱️ Dijital</span>
+          </button>
         </div>
-        <button id="btn-close-analog-modal" class="modal-close-btn" title="Küçült / Kapat (ESC)">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+        <div class="clock-header-right-actions">
+          <button type="button" id="btn-clock-modal-fullscreen" class="clock-fullscreen-action-btn" title="Saati Tam Ekran Moduna Al (F)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+            <span class="fs-label">Tam Ekran</span>
+          </button>
+          <button id="btn-close-analog-modal" class="modal-close-btn" title="Küçült / Kapat (ESC)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <div class="analog-modal-content">
+      <!-- ANALOG CLOCK VIEW PANE -->
+      <div id="clock-pane-analog" class="clock-view-pane active">
         <div class="large-clock-dial-container">
-          <div class="large-analog-dial">
+          <div class="large-analog-dial" id="large-analog-dial">
             <!-- Hour Markers -->
             <span class="clock-num num-12">12</span>
             <span class="clock-num num-1">1</span>
@@ -309,11 +322,61 @@
           </div>
         </div>
 
-        <div class="large-clock-info">
+        <div class="clock-sub-info">
           <div id="large-clock-digital-time" class="large-digital-display">00:00:00</div>
-          <div id="large-clock-digital-date" class="large-date-display">23 Kasım 2026, Pazartesi</div>
+          <div id="large-clock-digital-date" class="large-date-display">Yükleniyor...</div>
+        </div>
+
+        <!-- Analog Clock Customization Bar -->
+        <div class="clock-customization-bar">
+          <div class="clock-opt-group">
+            <span class="clock-opt-title">Kadran Stili:</span>
+            <div class="clock-pill-options">
+              <button type="button" class="clock-opt-pill active" data-analog-style="numbers">1-12 Sayılar</button>
+              <button type="button" class="clock-opt-pill" data-analog-style="roman">I-XII Romen</button>
+              <button type="button" class="clock-opt-pill" data-analog-style="minimal">Minimal Noktalar</button>
+            </div>
+          </div>
+          <div class="clock-opt-group">
+            <label class="clock-check-label">
+              <input type="checkbox" id="check-analog-second-hand" checked>
+              <span>Saniye İbresi</span>
+            </label>
+          </div>
         </div>
       </div>
+
+      <!-- DIGITAL CLOCK VIEW PANE -->
+      <div id="clock-pane-digital" class="clock-view-pane">
+        <div class="mega-digital-container">
+          <div id="mega-digital-time" class="mega-digital-time">00:00:00</div>
+          <div id="mega-digital-date" class="mega-digital-date">Yükleniyor...</div>
+        </div>
+
+        <!-- Digital Clock Customization Bar -->
+        <div class="clock-customization-bar">
+          <div class="clock-opt-group">
+            <span class="clock-opt-title">Yazı Tipi:</span>
+            <div class="clock-pill-options">
+              <button type="button" class="clock-opt-pill active" data-digital-font="space-mono">Teknoloji</button>
+              <button type="button" class="clock-opt-pill" data-digital-font="outfit">Modern Sans</button>
+              <button type="button" class="clock-opt-pill" data-digital-font="playfair">Zarif Serif</button>
+              <button type="button" class="clock-opt-pill" data-digital-font="quicksand">Yumuşak</button>
+            </div>
+          </div>
+          <div class="clock-opt-group">
+            <label class="clock-check-label">
+              <input type="checkbox" id="check-digital-format-24h" checked>
+              <span>24 Saat</span>
+            </label>
+            <label class="clock-check-label">
+              <input type="checkbox" id="check-digital-show-seconds" checked>
+              <span>Saniyeyi Göster</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 

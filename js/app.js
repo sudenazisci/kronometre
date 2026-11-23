@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     liveDateText: document.getElementById('live-date-text'),
     headerTimeDate: document.getElementById('header-time-date'),
     
-    // Analog Clock Elements
+    // Clock Modal & Live Clock Elements
     miniAnalogClockWrap: document.getElementById('mini-analog-clock-wrap'),
     miniClockHour: document.getElementById('mini-clock-hour'),
     miniClockMinute: document.getElementById('mini-clock-minute'),
@@ -18,11 +18,22 @@ document.addEventListener('DOMContentLoaded', () => {
     liveClockContainer: document.getElementById('live-clock-container'),
     analogClockModal: document.getElementById('analog-clock-modal'),
     btnCloseAnalogModal: document.getElementById('btn-close-analog-modal'),
+    tabClockAnalog: document.getElementById('tab-clock-analog'),
+    tabClockDigital: document.getElementById('tab-clock-digital'),
+    clockPaneAnalog: document.getElementById('clock-pane-analog'),
+    clockPaneDigital: document.getElementById('clock-pane-digital'),
+    btnClockModalFullscreen: document.getElementById('btn-clock-modal-fullscreen'),
+    largeAnalogDial: document.getElementById('large-analog-dial'),
     largeClockHour: document.getElementById('large-clock-hour'),
     largeClockMinute: document.getElementById('large-clock-minute'),
     largeClockSecond: document.getElementById('large-clock-second'),
     largeClockDigitalTime: document.getElementById('large-clock-digital-time'),
     largeClockDigitalDate: document.getElementById('large-clock-digital-date'),
+    megaDigitalTime: document.getElementById('mega-digital-time'),
+    megaDigitalDate: document.getElementById('mega-digital-date'),
+    checkAnalogSecondHand: document.getElementById('check-analog-second-hand'),
+    checkDigitalFormat24h: document.getElementById('check-digital-format-24h'),
+    checkDigitalShowSeconds: document.getElementById('check-digital-show-seconds'),
 
     // Exam Presets Bar
     examPresetsBar: document.getElementById('exam-presets-bar'),
@@ -170,6 +181,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dom.largeClockSecond) dom.largeClockSecond.style.transform = `rotate(${secDeg}deg)`;
     if (dom.largeClockDigitalTime) dom.largeClockDigitalTime.textContent = timeStr;
     if (dom.largeClockDigitalDate) dom.largeClockDigitalDate.textContent = dateStr;
+
+    // Mega Digital Clock view formatting (customizable)
+    const clockPrefs = settings.clockPrefs || {};
+    const use24h = clockPrefs.digitalFormat24h !== false;
+    let dispH = hours;
+    let ampmSuffix = '';
+    if (!use24h) {
+      ampmSuffix = dispH >= 12 ? ' PM' : ' AM';
+      dispH = dispH % 12 || 12;
+    }
+    const dispHStr = String(dispH).padStart(2, '0');
+    const dispMStr = String(minutes).padStart(2, '0');
+    const dispSStr = String(seconds).padStart(2, '0');
+    
+    const megaTime = (clockPrefs.showSeconds !== false)
+      ? `${dispHStr}:${dispMStr}:${dispSStr}${ampmSuffix}`
+      : `${dispHStr}:${dispMStr}${ampmSuffix}`;
+
+    if (dom.megaDigitalTime) dom.megaDigitalTime.textContent = megaTime;
+    if (dom.megaDigitalDate) dom.megaDigitalDate.textContent = dateStr;
   }
   setInterval(updateLiveClockAndDate, 1000);
   updateLiveClockAndDate();
@@ -211,9 +242,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sizes.stats) root.style.setProperty('--stats-size', `${sizes.stats}px`);
     if (sizes.buttons) root.style.setProperty('--btn-size', `${sizes.buttons}px`);
 
-    // Titles
-    if (dom.appTitleDisplay) dom.appTitleDisplay.textContent = settings.appName || '';
-    if (dom.appSubtitleDisplay) dom.appSubtitleDisplay.textContent = settings.subtitle || 'Kişisel Sınav & Çalışma Alanı';
+    // Titles (Sadece "Kronometre", ALES çalışma alanı ibaresi kaldırıldı)
+    if (dom.appTitleDisplay) {
+      dom.appTitleDisplay.textContent = 'Kronometre';
+      dom.appTitleDisplay.style.display = 'inline-block';
+    }
+    if (dom.appSubtitleDisplay) {
+      dom.appSubtitleDisplay.style.display = 'none';
+      dom.appSubtitleDisplay.textContent = '';
+    }
 
     // Element Visibilities
     const vis = settings.visibility || {};
@@ -396,29 +433,236 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Analog Clock Modal Open / Close Handlers
-  if (dom.miniAnalogClockWrap) {
-    dom.miniAnalogClockWrap.addEventListener('click', () => {
+  // Clock Modal (Analog / Dijital Seçimi, Özelleştirme ve Tam Ekran)
+  function initClockModal() {
+    if (!settings.clockPrefs) {
+      settings.clockPrefs = {
+        enlargedType: 'analog',
+        analogDialStyle: 'numbers',
+        showSeconds: true,
+        digitalFormat24h: true,
+        digitalFont: "'Space Mono', monospace"
+      };
+    }
+
+    const romanMap = {
+      '12': 'XII', '1': 'I', '2': 'II', '3': 'III', '4': 'IV', '5': 'V',
+      '6': 'VI', '7': 'VII', '8': 'VIII', '9': 'IX', '10': 'X', '11': 'XI'
+    };
+
+    function applyClockCustomizations() {
+      const prefs = settings.clockPrefs;
+
+      // 1. Switch between Analog and Digital
+      if (prefs.enlargedType === 'digital') {
+        if (dom.tabClockDigital) dom.tabClockDigital.classList.add('active');
+        if (dom.tabClockAnalog) dom.tabClockAnalog.classList.remove('active');
+        if (dom.clockPaneDigital) dom.clockPaneDigital.classList.add('active');
+        if (dom.clockPaneAnalog) dom.clockPaneAnalog.classList.remove('active');
+      } else {
+        if (dom.tabClockAnalog) dom.tabClockAnalog.classList.add('active');
+        if (dom.tabClockDigital) dom.tabClockDigital.classList.remove('active');
+        if (dom.clockPaneAnalog) dom.clockPaneAnalog.classList.add('active');
+        if (dom.clockPaneDigital) dom.clockPaneDigital.classList.remove('active');
+      }
+
+      // 2. Analog Dial Style
+      const style = prefs.analogDialStyle || 'numbers';
+      document.querySelectorAll('.clock-num').forEach(el => {
+        const numMatch = el.className.match(/num-(\d+)/);
+        if (numMatch) {
+          const num = numMatch[1];
+          if (style === 'roman') {
+            el.textContent = romanMap[num] || num;
+          } else {
+            el.textContent = num;
+          }
+        }
+      });
+
+      if (dom.largeAnalogDial) {
+        if (style === 'minimal') {
+          dom.largeAnalogDial.classList.add('dial-minimal');
+        } else {
+          dom.largeAnalogDial.classList.remove('dial-minimal');
+        }
+
+        // Show / Hide second hand
+        if (prefs.showSeconds === false) {
+          dom.largeAnalogDial.classList.add('hide-second-hand');
+        } else {
+          dom.largeAnalogDial.classList.remove('hide-second-hand');
+        }
+      }
+
+      // Sync analog style pills
+      document.querySelectorAll('[data-analog-style]').forEach(pill => {
+        if (pill.getAttribute('data-analog-style') === style) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+
+      if (dom.checkAnalogSecondHand) {
+        dom.checkAnalogSecondHand.checked = prefs.showSeconds !== false;
+      }
+
+      // 3. Digital Clock Font and Toggles
+      const font = prefs.digitalFont || "'Space Mono', monospace";
+      if (dom.megaDigitalTime) {
+        dom.megaDigitalTime.style.fontFamily = font;
+      }
+
+      document.querySelectorAll('[data-digital-font]').forEach(pill => {
+        const pFont = pill.getAttribute('data-digital-font');
+        const isActive = (pFont === 'space-mono' && font.includes('Space Mono')) ||
+                         (pFont === 'outfit' && font.includes('Outfit')) ||
+                         (pFont === 'playfair' && font.includes('Playfair')) ||
+                         (pFont === 'quicksand' && font.includes('Quicksand'));
+        if (isActive) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+
+      if (dom.checkDigitalFormat24h) {
+        dom.checkDigitalFormat24h.checked = prefs.digitalFormat24h !== false;
+      }
+      if (dom.checkDigitalShowSeconds) {
+        dom.checkDigitalShowSeconds.checked = prefs.showSeconds !== false;
+      }
+
+      updateLiveClockAndDate();
+    }
+
+    // Tab switcher events
+    if (dom.tabClockAnalog) {
+      dom.tabClockAnalog.addEventListener('click', () => {
+        settings.clockPrefs.enlargedType = 'analog';
+        window.StorageManager.saveSettings(settings);
+        applyClockCustomizations();
+      });
+    }
+
+    if (dom.tabClockDigital) {
+      dom.tabClockDigital.addEventListener('click', () => {
+        settings.clockPrefs.enlargedType = 'digital';
+        window.StorageManager.saveSettings(settings);
+        applyClockCustomizations();
+      });
+    }
+
+    // Analog dial style pills
+    document.querySelectorAll('[data-analog-style]').forEach(pill => {
+      pill.addEventListener('click', () => {
+        settings.clockPrefs.analogDialStyle = pill.getAttribute('data-analog-style');
+        window.StorageManager.saveSettings(settings);
+        applyClockCustomizations();
+      });
+    });
+
+    // Second hand checkbox
+    if (dom.checkAnalogSecondHand) {
+      dom.checkAnalogSecondHand.addEventListener('change', (e) => {
+        settings.clockPrefs.showSeconds = e.target.checked;
+        window.StorageManager.saveSettings(settings);
+        applyClockCustomizations();
+      });
+    }
+
+    // Digital font pills
+    document.querySelectorAll('[data-digital-font]').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const fontMap = {
+          'space-mono': "'Space Mono', monospace",
+          'outfit': "'Outfit', sans-serif",
+          'playfair': "'Playfair Display', serif",
+          'quicksand': "'Quicksand', sans-serif"
+        };
+        const selected = pill.getAttribute('data-digital-font');
+        settings.clockPrefs.digitalFont = fontMap[selected] || "'Space Mono', monospace";
+        window.StorageManager.saveSettings(settings);
+        applyClockCustomizations();
+      });
+    });
+
+    // 24h format checkbox
+    if (dom.checkDigitalFormat24h) {
+      dom.checkDigitalFormat24h.addEventListener('change', (e) => {
+        settings.clockPrefs.digitalFormat24h = e.target.checked;
+        window.StorageManager.saveSettings(settings);
+        updateLiveClockAndDate();
+      });
+    }
+
+    // Digital show seconds checkbox
+    if (dom.checkDigitalShowSeconds) {
+      dom.checkDigitalShowSeconds.addEventListener('change', (e) => {
+        settings.clockPrefs.showSeconds = e.target.checked;
+        window.StorageManager.saveSettings(settings);
+        applyClockCustomizations();
+      });
+    }
+
+    // Fullscreen Clock Toggle
+    function toggleClockFullscreen() {
+      if (!dom.analogClockModal) return;
+      const isFS = dom.analogClockModal.classList.toggle('clock-fullscreen-active');
+      const fsLabel = dom.btnClockModalFullscreen?.querySelector('.fs-label');
+      if (isFS) {
+        if (fsLabel) fsLabel.textContent = 'Küçült';
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen().catch(() => {});
+      } else {
+        if (fsLabel) fsLabel.textContent = 'Tam Ekran';
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => {});
+        }
+      }
+    }
+
+    if (dom.btnClockModalFullscreen) {
+      dom.btnClockModalFullscreen.addEventListener('click', toggleClockFullscreen);
+    }
+
+    // Open Modal
+    function openClockModal() {
+      applyClockCustomizations();
       if (dom.analogClockModal) dom.analogClockModal.classList.add('active');
-    });
-  }
-  if (dom.liveClockContainer) {
-    dom.liveClockContainer.addEventListener('click', () => {
-      if (dom.analogClockModal) dom.analogClockModal.classList.add('active');
-    });
-  }
-  if (dom.btnCloseAnalogModal) {
-    dom.btnCloseAnalogModal.addEventListener('click', () => {
-      if (dom.analogClockModal) dom.analogClockModal.classList.remove('active');
-    });
-  }
-  if (dom.analogClockModal) {
-    dom.analogClockModal.addEventListener('click', (e) => {
-      if (e.target === dom.analogClockModal) {
+    }
+
+    function closeClockModal() {
+      if (dom.analogClockModal) {
+        if (dom.analogClockModal.classList.contains('clock-fullscreen-active')) {
+          dom.analogClockModal.classList.remove('clock-fullscreen-active');
+          const fsLabel = dom.btnClockModalFullscreen?.querySelector('.fs-label');
+          if (fsLabel) fsLabel.textContent = 'Tam Ekran';
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+          }
+        }
         dom.analogClockModal.classList.remove('active');
       }
-    });
+    }
+
+    if (dom.miniAnalogClockWrap) dom.miniAnalogClockWrap.addEventListener('click', openClockModal);
+    if (dom.liveClockContainer) dom.liveClockContainer.addEventListener('click', openClockModal);
+    if (dom.btnCloseAnalogModal) dom.btnCloseAnalogModal.addEventListener('click', closeClockModal);
+
+    if (dom.analogClockModal) {
+      dom.analogClockModal.addEventListener('click', (e) => {
+        if (e.target === dom.analogClockModal) closeClockModal();
+      });
+    }
+
+    // Initial setup
+    applyClockCustomizations();
   }
+  initClockModal();
 
   // 7. Fullscreen Implementation
   function toggleFullscreen() {
@@ -1050,7 +1294,17 @@ document.addEventListener('DOMContentLoaded', () => {
       dom.statsModal.classList.remove('active');
       dom.resetConfirmModal.classList.remove('active');
       dom.alesCompleteModal.classList.remove('active');
-      if (dom.analogClockModal) dom.analogClockModal.classList.remove('active');
+      if (dom.analogClockModal) {
+        if (dom.analogClockModal.classList.contains('clock-fullscreen-active')) {
+          dom.analogClockModal.classList.remove('clock-fullscreen-active');
+          const fsLabel = dom.btnClockModalFullscreen?.querySelector('.fs-label');
+          if (fsLabel) fsLabel.textContent = 'Tam Ekran';
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+          }
+        }
+        dom.analogClockModal.classList.remove('active');
+      }
       if (isLayoutEditing) toggleLayoutEditMode(false);
     }
   });

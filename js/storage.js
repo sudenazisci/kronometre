@@ -9,8 +9,8 @@ const STORAGE_KEYS = {
 };
 
 const DEFAULT_SETTINGS = {
-  appName: '',
-  subtitle: 'Kişisel Sınav & Çalışma Alanı',
+  appName: 'Kronometre',
+  subtitle: '',
   currentTheme: 'cherry-blossom',
   fontFamily: "'Quicksand', sans-serif",
   timerFontFamily: "'Space Mono', monospace",
@@ -41,6 +41,15 @@ const DEFAULT_SETTINGS = {
     quote: 16,
     stats: 15,
     buttons: 16
+  },
+  
+  // Clock Customization Preferences
+  clockPrefs: {
+    enlargedType: 'analog', // 'analog' | 'digital'
+    analogDialStyle: 'numbers', // 'numbers' | 'roman' | 'minimal'
+    showSeconds: true,
+    digitalFormat24h: true,
+    digitalFont: "'Space Mono', monospace"
   },
   
   // Decorations config
@@ -108,9 +117,16 @@ class StorageManager {
       if (!data) return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
       const parsed = JSON.parse(data);
       // Deep merge with defaults to ensure all keys exist
+      // Clean up legacy ALES subtitle & ensure appName
+      const appName = (!parsed.appName || parsed.appName === 'Study Bloom') ? 'Kronometre' : parsed.appName;
+      const subtitle = (parsed.subtitle === 'ALES Çalışma Alanı' || parsed.subtitle === 'Kişisel Sınav & Çalışma Alanı') ? '' : (parsed.subtitle || '');
+
       return {
         ...DEFAULT_SETTINGS,
         ...parsed,
+        appName,
+        subtitle,
+        clockPrefs: { ...DEFAULT_SETTINGS.clockPrefs, ...(parsed.clockPrefs || {}) },
         customColors: { ...DEFAULT_SETTINGS.customColors, ...(parsed.customColors || {}) },
         fontSizes: { ...DEFAULT_SETTINGS.fontSizes, ...(parsed.fontSizes || {}) },
         decorations: { 
