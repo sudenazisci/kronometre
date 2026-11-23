@@ -10,6 +10,31 @@ document.addEventListener('DOMContentLoaded', () => {
     liveDateText: document.getElementById('live-date-text'),
     headerTimeDate: document.getElementById('header-time-date'),
     
+    // Analog Clock Elements
+    miniAnalogClockWrap: document.getElementById('mini-analog-clock-wrap'),
+    miniClockHour: document.getElementById('mini-clock-hour'),
+    miniClockMinute: document.getElementById('mini-clock-minute'),
+    miniClockSecond: document.getElementById('mini-clock-second'),
+    liveClockContainer: document.getElementById('live-clock-container'),
+    analogClockModal: document.getElementById('analog-clock-modal'),
+    btnCloseAnalogModal: document.getElementById('btn-close-analog-modal'),
+    largeClockHour: document.getElementById('large-clock-hour'),
+    largeClockMinute: document.getElementById('large-clock-minute'),
+    largeClockSecond: document.getElementById('large-clock-second'),
+    largeClockDigitalTime: document.getElementById('large-clock-digital-time'),
+    largeClockDigitalDate: document.getElementById('large-clock-digital-date'),
+
+    // Exam Presets Bar
+    examPresetsBar: document.getElementById('exam-presets-bar'),
+    chipCustomDurationText: document.getElementById('chip-custom-duration-text'),
+
+    // Prominent Stats (Büyük Görünüm)
+    prominentStatsCards: document.getElementById('prominent-stats-cards'),
+    prominentStatToday: document.getElementById('prominent-stat-today'),
+    prominentStatTodaySessions: document.getElementById('prominent-stat-today-sessions'),
+    prominentStatWeekly: document.getElementById('prominent-stat-weekly'),
+    prominentStatWeeklyDays: document.getElementById('prominent-stat-weekly-days'),
+    
     // Actions
     btnToggleLayout: document.getElementById('btn-toggle-layout'),
     btnOpenStats: document.getElementById('btn-open-stats'),
@@ -79,11 +104,35 @@ document.addEventListener('DOMContentLoaded', () => {
     onAlesComplete: () => handleAlesCompletion()
   });
 
-  // Set initial ALES duration from settings
+  // Set initial custom duration from settings
   timerEngine.setAlesDuration(settings.timerPrefs.alesDurationMinutes || 150);
   timerEngine.sound.enabled = settings.timerPrefs.soundEnabled !== false;
 
-  // 4. Live Clock & Turkish Date System
+  // Sync initial mode and preset UI state
+  if (timerEngine.mode === 'ales') {
+    dom.tabModeAles.classList.add('active');
+    dom.tabModeNormal.classList.remove('active');
+    if (dom.examPresetsBar) dom.examPresetsBar.style.display = 'flex';
+  } else {
+    dom.tabModeNormal.classList.add('active');
+    dom.tabModeAles.classList.remove('active');
+    if (dom.examPresetsBar) dom.examPresetsBar.style.display = 'none';
+  }
+
+  // Sync preset chip active class
+  document.querySelectorAll('.exam-chip-btn').forEach(btn => {
+    if (btn.getAttribute('data-preset') === timerEngine.currentPresetId) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // Initial update
+  timerEngine.updateTick();
+  handleTimerStateChange(timerEngine.getState());
+
+  // 4. Live Clock & Turkish Date System (Digital + Analog Hands)
   function updateLiveClockAndDate() {
     const now = new Date();
     
@@ -100,6 +149,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateOptions = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
     const dateStr = now.toLocaleDateString('tr-TR', dateOptions);
     if (dom.liveDateText) dom.liveDateText.textContent = dateStr;
+
+    // Analog Clock Hands Rotation
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    const secDeg = seconds * 6;
+    const minDeg = (minutes + seconds / 60) * 6;
+    const hourDeg = ((hours % 12) + minutes / 60) * 30;
+
+    // Mini clock hands
+    if (dom.miniClockHour) dom.miniClockHour.style.transform = `rotate(${hourDeg}deg)`;
+    if (dom.miniClockMinute) dom.miniClockMinute.style.transform = `rotate(${minDeg}deg)`;
+    if (dom.miniClockSecond) dom.miniClockSecond.style.transform = `rotate(${secDeg}deg)`;
+
+    // Large clock hands & displays
+    if (dom.largeClockHour) dom.largeClockHour.style.transform = `rotate(${hourDeg}deg)`;
+    if (dom.largeClockMinute) dom.largeClockMinute.style.transform = `rotate(${minDeg}deg)`;
+    if (dom.largeClockSecond) dom.largeClockSecond.style.transform = `rotate(${secDeg}deg)`;
+    if (dom.largeClockDigitalTime) dom.largeClockDigitalTime.textContent = timeStr;
+    if (dom.largeClockDigitalDate) dom.largeClockDigitalDate.textContent = dateStr;
   }
   setInterval(updateLiveClockAndDate, 1000);
   updateLiveClockAndDate();
@@ -142,8 +212,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sizes.buttons) root.style.setProperty('--btn-size', `${sizes.buttons}px`);
 
     // Titles
-    if (dom.appTitleDisplay) dom.appTitleDisplay.textContent = settings.appName || 'Study Bloom';
-    if (dom.appSubtitleDisplay) dom.appSubtitleDisplay.textContent = settings.subtitle || 'ALES Çalışma Alanı';
+    if (dom.appTitleDisplay) dom.appTitleDisplay.textContent = settings.appName || '';
+    if (dom.appSubtitleDisplay) dom.appSubtitleDisplay.textContent = settings.subtitle || 'Kişisel Sınav & Çalışma Alanı';
 
     // Element Visibilities
     const vis = settings.visibility || {};
@@ -170,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
       dom.alesProgressContainer.classList.remove('visible');
       dom.timerTargetTag.style.display = 'none';
     } else {
-      // In ALES mode, show HH:MM:SS or MM:SS based on settings
+      // In Exam mode, show HH:MM:SS or MM:SS based on settings
       if (settings.timerPrefs?.showHourInAles) {
         dom.timerDigits.textContent = data.formatted.fullStr;
       } else {
@@ -179,6 +249,9 @@ document.addEventListener('DOMContentLoaded', () => {
       dom.alesProgressContainer.classList.add('visible');
       dom.alesProgressFill.style.width = `${data.progressPercent || 0}%`;
       dom.timerTargetTag.style.display = 'block';
+
+      const preset = data.preset || window.EXAM_PRESETS[timerEngine.currentPresetId] || window.EXAM_PRESETS['ales-150'];
+      dom.timerTargetTag.textContent = `${preset.name} • ${preset.subtitle}`;
     }
   }
 
@@ -187,7 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
       dom.btnStart.style.display = 'none';
       dom.btnPause.style.display = 'inline-flex';
       dom.studyStatusIndicator.classList.add('is-running');
-      dom.studyStatusText.textContent = state.mode === 'ales' ? 'ALES DENEMESİ AKTİF' : 'ÇALIŞMA AKTİF';
+      const preset = window.EXAM_PRESETS[timerEngine.currentPresetId] || window.EXAM_PRESETS['ales-150'];
+      dom.studyStatusText.textContent = state.mode === 'ales' ? `${preset.shortName.toUpperCase()} AKTİF` : 'ÇALIŞMA AKTİF';
 
       if (state.mode === 'ales') {
         dom.btnFinishAles.style.display = 'inline-flex';
@@ -214,13 +288,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleAlesCompletion() {
+    const preset = window.EXAM_PRESETS[timerEngine.currentPresetId] || window.EXAM_PRESETS['ales-150'];
+    const celebrateTitle = document.getElementById('ales-celebrate-title');
+    const celebrateDesc = document.getElementById('ales-celebrate-desc');
+    if (celebrateTitle) celebrateTitle.textContent = `Tebrikler! ${preset.shortName} Tamamlandı! 🎉`;
+    if (celebrateDesc) celebrateDesc.textContent = `${preset.name} için belirlediğin ${preset.durationMinutes} dakikalık süreyi başarıyla tamamladın.`;
+
     dom.alesCompleteModal.classList.add('active');
     updateMainMiniStats();
     
     // Browser Notification if supported
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("Study Bloom – ALES Süresi Bitti!", {
-        body: "150 dakikalık deneme sınavı süreniz tamamlandı. Harika bir çalışma oldu!",
+      new Notification(`Study Bloom – ${preset.name} Süresi Bitti!`, {
+        body: `${preset.durationMinutes} dakikalık sınav süreniz tamamlandı. Harika bir çalışma oldu!`,
         icon: "🌸"
       });
     }
@@ -255,7 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (timerEngine.mode === 'normal') {
       timerEngine.finishNormalSession('Normal Çalışma');
     } else {
-      timerEngine.finishAlesSession(true, 'ALES Erken Bitirildi');
+      const preset = window.EXAM_PRESETS[timerEngine.currentPresetId] || window.EXAM_PRESETS['ales-150'];
+      timerEngine.finishAlesSession(true, `${preset.shortName} Erken Bitirildi`);
     }
     dom.resetConfirmModal.classList.remove('active');
     updateMainMiniStats();
@@ -272,9 +353,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   dom.btnFinishAles.addEventListener('click', () => {
-    if (confirm('ALES sınav oturumunu erken bitirip çalışma geçmişine kaydetmek istiyor musunuz?')) {
+    const preset = window.EXAM_PRESETS[timerEngine.currentPresetId] || window.EXAM_PRESETS['ales-150'];
+    if (confirm(`${preset.name} sınav oturumunu erken bitirip çalışma geçmişine kaydetmek istiyor musunuz?`)) {
       timerEngine.pause();
-      timerEngine.finishAlesSession(true, 'Sınav erken bitirildi');
+      timerEngine.finishAlesSession(true, `${preset.shortName} erken bitirildi`);
       dom.alesCompleteModal.classList.add('active');
       updateMainMiniStats();
     }
@@ -288,18 +370,55 @@ document.addEventListener('DOMContentLoaded', () => {
   dom.tabModeNormal.addEventListener('click', () => {
     dom.tabModeNormal.classList.add('active');
     dom.tabModeAles.classList.remove('active');
+    if (dom.examPresetsBar) dom.examPresetsBar.style.display = 'none';
     timerEngine.setMode('normal');
   });
 
   dom.tabModeAles.addEventListener('click', () => {
     dom.tabModeAles.classList.add('active');
     dom.tabModeNormal.classList.remove('active');
+    if (dom.examPresetsBar) dom.examPresetsBar.style.display = 'flex';
     timerEngine.setMode('ales');
-    const mins = settings.timerPrefs?.alesDurationMinutes || 150;
-    const h = Math.floor(mins / 60);
-    const m = mins % 60;
-    dom.timerTargetTag.textContent = `Hedef Süre: ${mins} Dakika (${h > 0 ? h + ' sa ' : ''}${m > 0 ? m + ' dk' : ''})`;
+    const preset = window.EXAM_PRESETS[timerEngine.currentPresetId] || window.EXAM_PRESETS['ales-150'];
+    dom.timerTargetTag.textContent = `${preset.name} • ${preset.subtitle}`;
   });
+
+  // Exam Presets Bar Chips
+  const examChipBtns = document.querySelectorAll('.exam-chip-btn');
+  examChipBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const presetId = btn.getAttribute('data-preset');
+      examChipBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      timerEngine.setExamPreset(presetId);
+      const preset = window.EXAM_PRESETS[presetId] || window.EXAM_PRESETS['ales-150'];
+      dom.timerTargetTag.textContent = `${preset.name} • ${preset.subtitle}`;
+    });
+  });
+
+  // Analog Clock Modal Open / Close Handlers
+  if (dom.miniAnalogClockWrap) {
+    dom.miniAnalogClockWrap.addEventListener('click', () => {
+      if (dom.analogClockModal) dom.analogClockModal.classList.add('active');
+    });
+  }
+  if (dom.liveClockContainer) {
+    dom.liveClockContainer.addEventListener('click', () => {
+      if (dom.analogClockModal) dom.analogClockModal.classList.add('active');
+    });
+  }
+  if (dom.btnCloseAnalogModal) {
+    dom.btnCloseAnalogModal.addEventListener('click', () => {
+      if (dom.analogClockModal) dom.analogClockModal.classList.remove('active');
+    });
+  }
+  if (dom.analogClockModal) {
+    dom.analogClockModal.addEventListener('click', (e) => {
+      if (e.target === dom.analogClockModal) {
+        dom.analogClockModal.classList.remove('active');
+      }
+    });
+  }
 
   // 7. Fullscreen Implementation
   function toggleFullscreen() {
@@ -365,6 +484,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dom.miniStatToday) dom.miniStatToday.textContent = stats.today.formatted;
     if (dom.miniStatOverall) dom.miniStatOverall.textContent = stats.overall.formatted;
     if (dom.miniStatSessions) dom.miniStatSessions.textContent = `${stats.today.sessionCount} oturum`;
+
+    // Prominent big stats (Ana ekran büyük gösterim)
+    if (dom.prominentStatToday) dom.prominentStatToday.textContent = stats.today.formatted;
+    if (dom.prominentStatTodaySessions) dom.prominentStatTodaySessions.textContent = `${stats.today.sessionCount} oturum tamamlandı`;
+    if (dom.prominentStatWeekly) dom.prominentStatWeekly.textContent = stats.weekly.formatted;
+    if (dom.prominentStatWeeklyDays) dom.prominentStatWeeklyDays.textContent = `${stats.weekly.daysStudied || 0} aktif gün`;
 
     // Overview modal stats
     const todayBig = document.getElementById('stat-today-big');
@@ -642,9 +767,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const inputAppSubtitle = document.getElementById('input-app-subtitle');
-    inputAppSubtitle.value = settings.subtitle || 'ALES Çalışma Alanı';
+    inputAppSubtitle.value = settings.subtitle || 'Kişisel Sınav & Çalışma Alanı';
     inputAppSubtitle.onchange = () => {
-      settings.subtitle = inputAppSubtitle.value.trim() || 'ALES Çalışma Alanı';
+      settings.subtitle = inputAppSubtitle.value.trim() || 'Kişisel Sınav & Çalışma Alanı';
       window.StorageManager.saveSettings(settings);
       applyThemeAndStyles();
     };
@@ -925,6 +1050,7 @@ document.addEventListener('DOMContentLoaded', () => {
       dom.statsModal.classList.remove('active');
       dom.resetConfirmModal.classList.remove('active');
       dom.alesCompleteModal.classList.remove('active');
+      if (dom.analogClockModal) dom.analogClockModal.classList.remove('active');
       if (isLayoutEditing) toggleLayoutEditMode(false);
     }
   });

@@ -1,4 +1,47 @@
-// Study Bloom - High-Precision Drift-Free Timer Engine & Audio Chimes
+// Study Bloom - High-Precision Drift-Free Timer Engine & Exam Modes
+
+const EXAM_PRESETS = {
+  'ales-150': {
+    id: 'ales-150',
+    name: 'ALES Sınavı',
+    shortName: 'ALES',
+    durationMinutes: 150,
+    questions: 100,
+    subtitle: '150 Dakika (100 Soru)'
+  },
+  'hakim-all-130': {
+    id: 'hakim-all-130',
+    name: 'Hâkim & Savcı Yardımcılığı (Tüm Sınav)',
+    shortName: 'Hâkim/Savcı Tüm',
+    durationMinutes: 130,
+    questions: 100,
+    subtitle: '130 Dakika (100 Soru - Tek Oturum)'
+  },
+  'hakim-part1-80': {
+    id: 'hakim-part1-80',
+    name: 'Hâkim/Savcı 1. Oturum (Genel Yetenek/Kültür & Ortak Alan)',
+    shortName: 'Hâkim/Savcı 1. Oturum',
+    durationMinutes: 80,
+    questions: 65,
+    subtitle: '80 Dakika (Ortak Alan - 65 Soru)'
+  },
+  'hakim-part2-50': {
+    id: 'hakim-part2-50',
+    name: 'Hâkim/Savcı 2. Oturum (Alan Testi)',
+    shortName: 'Hâkim/Savcı 2. Oturum',
+    durationMinutes: 50,
+    questions: 35,
+    subtitle: '50 Dakika (Alan Testi - 35 Soru)'
+  },
+  'custom': {
+    id: 'custom',
+    name: 'Özel Sınav Süresi',
+    shortName: 'Özel Süre',
+    durationMinutes: 90,
+    questions: null,
+    subtitle: 'Kullanıcı Tanımlı'
+  }
+};
 
 class SoundEngine {
   constructor() {
@@ -88,7 +131,7 @@ class SoundEngine {
 
 class TimerEngine {
   constructor(options = {}) {
-    this.mode = 'normal'; // 'normal' | 'ales'
+    this.mode = 'normal'; // 'normal' | 'ales' (exam)
     this.state = 'idle'; // 'idle' | 'running' | 'paused'
     
     // Normal stopwatch state
@@ -96,11 +139,12 @@ class TimerEngine {
     this.normalStartTime = null;
     this.normalSessionStartClock = null;
 
-    // ALES countdown state
-    this.alesTotalSeconds = 150 * 60; // 150 mins
-    this.alesRemainingMs = 150 * 60 * 1000;
-    this.alesStartTime = null;
-    this.alesSessionStartClock = null;
+    // Exam countdown state
+    this.currentPresetId = 'ales-150';
+    this.examTotalSeconds = 150 * 60; // 150 mins
+    this.examRemainingMs = 150 * 60 * 1000;
+    this.examStartTime = null;
+    this.examSessionStartClock = null;
 
     this.timerInterval = null;
     this.sound = new SoundEngine();
@@ -109,12 +153,22 @@ class TimerEngine {
     this.onStateChange = options.onStateChange || (() => {});
     this.onAlesComplete = options.onAlesComplete || (() => {});
 
+    // Try restoring any ongoing active session from localStorage
+    this.restoreActiveSession();
+
     // Tab visibility change handler to recalculate instantly when waking up
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && this.state === 'running') {
         this.updateTick();
       }
     });
+
+    // Save timer state periodically (every 2.5s)
+    setInterval(() => {
+      if (this.state === 'running' || this.state === 'paused') {
+        this.persistActiveSession();
+      }
+    }, 2500);
   }
 
   setMode(newMode) {
@@ -123,17 +177,62 @@ class TimerEngine {
       this.pause();
     }
     this.mode = newMode;
+    this.persistActiveSession();
     this.onStateChange(this.getState());
     this.updateTick();
   }
 
-  setAlesDuration(minutes) {
-    const mins = Math.max(1, parseInt(minutes, 10) || 150);
-    this.alesTotalSeconds = mins * 60;
+  setExamPreset(presetId, customMinutes = null) {
+    this.currentPresetId = presetId;
+    let mins = 150;
+
+    if (presetId === 'custom') {
+      mins = Math.max(1, parseInt(customMinutes, 10) || 90);
+      EXAM_PRESETS.custom.durationMinutes = mins;
+      EXAM_PRESETS.custom.subtitle = `${mins} Dakika (Özel)`;
+    } else if (EXAM_PRESETS[presetId]) {
+      mins = EXAM_PRESETS[presetId].durationMinutes;
+    }
+
+    this.examTotalSeconds = mins * 60;
     if (this.state === 'idle' || this.mode === 'ales') {
-      this.alesRemainingMs = this.alesTotalSeconds * 1000;
+      this.examRemainingMs = this.examTotalSeconds * 1000;
       this.updateTick();
     }
+    this.persistActiveSession();
+  }
+
+  // Update custom preset duration
+  setAlesDuration(minutes) {
+    const mins = Math.max(1, parseInt(minutes, 10) || 90);
+    if (EXAM_PRESETS.custom) {
+      EXAM_PRESETS.custom.durationMinutes = mins;
+      EXAM_PRESETS.custom.subtitle = `${mins} Dakika (Özel)`;
+    }
+    if (this.currentPresetId === 'custom') {
+      this.setExamPreset('custom', mins);
+    }
+  }
+
+  getAlesTotalSeconds() {
+    return this.examTotalSeconds;
+  }
+
+  getAlesRemainingMs() {
+    let remaining = this.examRemainingMs;
+    if (this.state === 'running' && this.mode === 'ales' && this.examStartTime) {
+      const delta = Date.now() - this.examStartTime;
+      remaining = Math.max(0, remaining - delta);
+    }
+    return remaining;
+  }
+
+  getNormalElapsedMs() {
+    let total = this.normalElapsedMs;
+    if (this.state === 'running' && this.mode === 'normal' && this.normalStartTime) {
+      total += (Date.now() - this.normalStartTime);
+    }
+    return total;
   }
 
   start() {
@@ -149,15 +248,16 @@ class TimerEngine {
         this.normalSessionStartClock = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       }
     } else {
-      this.alesStartTime = now;
-      if (!this.alesSessionStartClock) {
-        this.alesSessionStartClock = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      this.examStartTime = now;
+      if (!this.examSessionStartClock) {
+        this.examSessionStartClock = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       }
     }
 
     if (this.timerInterval) clearInterval(this.timerInterval);
     this.timerInterval = setInterval(() => this.updateTick(), 200);
 
+    this.persistActiveSession();
     this.updateTick();
     this.onStateChange(this.getState());
   }
@@ -173,10 +273,10 @@ class TimerEngine {
         this.normalStartTime = null;
       }
     } else {
-      if (this.alesStartTime) {
-        const delta = now - this.alesStartTime;
-        this.alesRemainingMs = Math.max(0, this.alesRemainingMs - delta);
-        this.alesStartTime = null;
+      if (this.examStartTime) {
+        const delta = now - this.examStartTime;
+        this.examRemainingMs = Math.max(0, this.examRemainingMs - delta);
+        this.examStartTime = null;
       }
     }
 
@@ -186,6 +286,7 @@ class TimerEngine {
       this.timerInterval = null;
     }
 
+    this.persistActiveSession();
     this.updateTick();
     this.onStateChange(this.getState());
   }
@@ -203,27 +304,30 @@ class TimerEngine {
         endTime: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         durationSeconds: durationSec,
         mode: 'normal',
+        examName: 'Normal Çalışma',
         note: note
       });
     }
     this.resetNormal();
   }
 
-  // Completes and logs ALES session
+  // Completes and logs Exam session
   finishAlesSession(completedEarly = false, note = '') {
-    const totalTargetSec = this.alesTotalSeconds;
+    const preset = EXAM_PRESETS[this.currentPresetId] || EXAM_PRESETS['ales-150'];
+    const totalTargetSec = this.examTotalSeconds;
     const remainingSec = Math.floor(this.getAlesRemainingMs() / 1000);
     const durationSec = totalTargetSec - remainingSec;
 
-    if (durationSec >= 10) {
+    if (durationSec >= 5) {
       window.StorageManager.addSession({
-        startTime: this.alesSessionStartClock || new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+        startTime: this.examSessionStartClock || new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
         endTime: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         durationSeconds: durationSec,
         targetSeconds: totalTargetSec,
         mode: 'ales',
+        examName: preset.name,
         completed: !completedEarly,
-        note: note || (completedEarly ? 'Erken sonlandırıldı' : 'Süre tamamlandı')
+        note: note || (completedEarly ? `${preset.shortName} erken sonlandırıldı` : `${preset.shortName} süresi tamamlandı`)
       });
     }
     this.resetAles();
@@ -239,20 +343,22 @@ class TimerEngine {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+    window.StorageManager.clearActiveTimer();
     this.updateTick();
     this.onStateChange(this.getState());
   }
 
   resetAles() {
     this.state = 'idle';
-    this.alesRemainingMs = this.alesTotalSeconds * 1000;
-    this.alesStartTime = null;
-    this.alesSessionStartClock = null;
+    this.examRemainingMs = this.examTotalSeconds * 1000;
+    this.examStartTime = null;
+    this.examSessionStartClock = null;
 
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+    window.StorageManager.clearActiveTimer();
     this.updateTick();
     this.onStateChange(this.getState());
   }
@@ -266,21 +372,50 @@ class TimerEngine {
     }
   }
 
-  getNormalElapsedMs() {
-    let total = this.normalElapsedMs;
-    if (this.state === 'running' && this.mode === 'normal' && this.normalStartTime) {
-      total += (Date.now() - this.normalStartTime);
-    }
-    return total;
+  persistActiveSession() {
+    try {
+      const data = {
+        mode: this.mode,
+        state: this.state,
+        currentPresetId: this.currentPresetId,
+        normalElapsedMs: this.getNormalElapsedMs(),
+        normalSessionStartClock: this.normalSessionStartClock,
+        examRemainingMs: this.getAlesRemainingMs(),
+        examTotalSeconds: this.examTotalSeconds,
+        examSessionStartClock: this.examSessionStartClock,
+        savedAt: Date.now()
+      };
+      window.StorageManager.saveActiveTimer(data);
+    } catch (e) {}
   }
 
-  getAlesRemainingMs() {
-    let remaining = this.alesRemainingMs;
-    if (this.state === 'running' && this.mode === 'ales' && this.alesStartTime) {
-      const delta = Date.now() - this.alesStartTime;
-      remaining = Math.max(0, remaining - delta);
-    }
-    return remaining;
+  restoreActiveSession() {
+    try {
+      const saved = window.StorageManager.getActiveTimer();
+      if (!saved) return;
+
+      this.mode = saved.mode || 'normal';
+      this.currentPresetId = saved.currentPresetId || 'ales-150';
+      if (saved.examTotalSeconds) this.examTotalSeconds = saved.examTotalSeconds;
+
+      if (this.mode === 'normal') {
+        let elapsed = saved.normalElapsedMs || 0;
+        if (saved.state === 'running' && saved.savedAt) {
+          elapsed += (Date.now() - saved.savedAt);
+        }
+        this.normalElapsedMs = elapsed;
+        this.normalSessionStartClock = saved.normalSessionStartClock;
+        this.state = saved.state === 'running' ? 'paused' : (saved.state || 'idle');
+      } else {
+        let remaining = saved.examRemainingMs !== undefined ? saved.examRemainingMs : (this.examTotalSeconds * 1000);
+        if (saved.state === 'running' && saved.savedAt) {
+          remaining = Math.max(0, remaining - (Date.now() - saved.savedAt));
+        }
+        this.examRemainingMs = remaining;
+        this.examSessionStartClock = saved.examSessionStartClock;
+        this.state = saved.state === 'running' ? 'paused' : (saved.state || 'idle');
+      }
+    } catch (e) {}
   }
 
   updateTick() {
@@ -301,7 +436,7 @@ class TimerEngine {
       const remainingMs = this.getAlesRemainingMs();
       const totalSec = Math.ceil(remainingMs / 1000);
 
-      // Check if ALES countdown reached 0
+      // Check if Exam countdown reached 0
       if (totalSec <= 0 && this.state === 'running') {
         this.pause();
         this.sound.playCompletionChime();
@@ -310,11 +445,12 @@ class TimerEngine {
       }
 
       const formatted = this.formatTime(totalSec, true);
-      const totalAlesSec = this.alesTotalSeconds;
-      const progressPercent = Math.min(100, Math.max(0, ((totalAlesSec - totalSec) / totalAlesSec) * 100));
+      const totalExamSec = this.examTotalSeconds;
+      const progressPercent = Math.min(100, Math.max(0, ((totalExamSec - totalSec) / totalExamSec) * 100));
 
       this.onTick({
         mode: 'ales',
+        preset: EXAM_PRESETS[this.currentPresetId] || EXAM_PRESETS['ales-150'],
         formatted: formatted,
         totalSeconds: totalSec,
         hours: formatted.hours,
@@ -354,13 +490,16 @@ class TimerEngine {
   getState() {
     return {
       mode: this.mode,
+      presetId: this.currentPresetId,
+      preset: EXAM_PRESETS[this.currentPresetId] || EXAM_PRESETS['ales-150'],
       state: this.state,
       normalElapsedSeconds: Math.floor(this.getNormalElapsedMs() / 1000),
       alesRemainingSeconds: Math.ceil(this.getAlesRemainingMs() / 1000),
-      alesTotalSeconds: this.alesTotalSeconds
+      alesTotalSeconds: this.examTotalSeconds
     };
   }
 }
 
+window.EXAM_PRESETS = EXAM_PRESETS;
 window.SoundEngine = SoundEngine;
 window.TimerEngine = TimerEngine;

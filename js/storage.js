@@ -4,12 +4,13 @@ const STORAGE_KEYS = {
   SETTINGS: 'study_bloom_settings',
   HISTORY: 'study_bloom_history',
   QUOTES: 'study_bloom_quotes',
-  LAYOUT: 'study_bloom_layout'
+  LAYOUT: 'study_bloom_layout',
+  ACTIVE_TIMER: 'study_bloom_active_timer'
 };
 
 const DEFAULT_SETTINGS = {
   appName: '',
-  subtitle: 'ALES Çalışma Alanı',
+  subtitle: 'Kişisel Sınav & Çalışma Alanı',
   currentTheme: 'cherry-blossom',
   fontFamily: "'Quicksand', sans-serif",
   timerFontFamily: "'Space Mono', monospace",
@@ -235,6 +236,27 @@ class StorageManager {
     localStorage.removeItem(STORAGE_KEYS.SETTINGS);
     localStorage.removeItem(STORAGE_KEYS.LAYOUT);
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+  }
+
+  static saveActiveTimer(state) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_TIMER, JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  static getActiveTimer() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ACTIVE_TIMER);
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static clearActiveTimer() {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.ACTIVE_TIMER);
+    } catch (e) {}
   }
 
   static exportBackup() {

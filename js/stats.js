@@ -200,9 +200,10 @@ class StatsManager {
       `;
 
       items.forEach(session => {
-        const isAles = session.mode === 'ales';
-        const modeBadge = isAles 
-          ? `<span class="session-badge ales-badge">🎯 ALES Deneme (${session.completed ? 'Tamamlandı' : 'Erken Bitti'})</span>`
+        const isExam = session.mode === 'ales' || session.mode === 'exam';
+        const examTitle = session.examName || 'Sınav Denemesi';
+        const modeBadge = isExam 
+          ? `<span class="session-badge ales-badge">🎯 ${examTitle} (${session.completed ? 'Tamamlandı' : 'Erken Bitti'})</span>`
           : `<span class="session-badge normal-badge">⏱️ Normal Çalışma</span>`;
 
         html += `

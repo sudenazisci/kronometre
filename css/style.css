@@ -216,11 +216,84 @@ button {
 .header-clock-date {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 6px 18px;
+  gap: 14px;
+  padding: 6px 16px;
   background: var(--bg-secondary);
   border-radius: 40px;
   border: 1px solid var(--border-color);
+}
+
+/* Mini Analog Clock (Clickable to Enlarge) */
+.mini-analog-clock-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.mini-analog-clock-wrap:hover {
+  border-color: var(--accent-color);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.mini-analog-dial {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-primary);
+  position: relative;
+  background: var(--bg-card);
+}
+
+.mini-clock-hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: bottom center;
+  border-radius: 2px;
+}
+
+.mini-clock-hand.mini-hour {
+  width: 2px;
+  height: 7px;
+  background: var(--text-primary);
+  margin-left: -1px;
+}
+
+.mini-clock-hand.mini-minute {
+  width: 1.5px;
+  height: 10px;
+  background: var(--accent-color);
+  margin-left: -0.75px;
+}
+
+.mini-clock-hand.mini-second {
+  width: 1px;
+  height: 11px;
+  background: var(--deco-color-2);
+  margin-left: -0.5px;
+}
+
+.mini-clock-center-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  background: var(--text-primary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.mini-clock-zoom-hint {
+  font-size: 11px;
+  opacity: 0.6;
 }
 
 .live-clock {
@@ -333,6 +406,272 @@ button {
   background: var(--btn-bg);
   color: var(--btn-text);
   box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+/* Exam Presets Selection Bar */
+.exam-presets-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 auto 16px auto;
+  max-width: 900px;
+  width: 100%;
+  z-index: 15;
+}
+
+.exam-chip-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 16px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: var(--glass-blur);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 125px;
+}
+
+.exam-chip-btn:hover {
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.exam-chip-btn.active {
+  background: var(--btn-bg);
+  border-color: var(--btn-bg);
+  color: var(--btn-text);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.exam-chip-btn.active .chip-title,
+.exam-chip-btn.active .chip-duration,
+.exam-chip-btn.active .chip-sub {
+  color: var(--btn-text);
+  opacity: 1;
+}
+
+.chip-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.chip-duration {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent-color);
+  margin: 2px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Prominent Daily & Weekly Study Time Cards (Daha Büyük Görünüm) */
+.prominent-stats-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  max-width: 860px;
+  width: 100%;
+  margin-top: 18px;
+  z-index: 15;
+}
+
+.prominent-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 26px;
+  background: var(--bg-card);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--glass-blur);
+  transition: all 0.25s ease;
+}
+
+.prominent-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--accent-color);
+}
+
+.prominent-stat-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.prominent-stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.prominent-stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  margin-bottom: 2px;
+}
+
+.prominent-stat-number {
+  font-size: clamp(24px, 3.2vw, 32px);
+  font-weight: 800;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.today-stat-card .prominent-stat-number {
+  color: var(--timer-color);
+}
+
+.weekly-stat-card .prominent-stat-number {
+  color: var(--accent-color);
+}
+
+.prominent-stat-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Large Analog Clock Modal */
+.analog-modal-card {
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.analog-modal-content {
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.large-clock-dial-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.large-analog-dial {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  border: 4px solid var(--text-primary);
+  position: relative;
+  background: radial-gradient(circle, var(--bg-card) 60%, var(--bg-secondary) 100%);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.1), 0 0 0 8px var(--bg-secondary);
+}
+
+.clock-num {
+  position: absolute;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  transform: translate(-50%, -50%);
+}
+
+.num-12 { top: 12%; left: 50%; }
+.num-1  { top: 17%; left: 69%; }
+.num-2  { top: 31%; left: 83%; }
+.num-3  { top: 50%; left: 88%; }
+.num-4  { top: 69%; left: 83%; }
+.num-5  { top: 83%; left: 69%; }
+.num-6  { top: 88%; left: 50%; }
+.num-7  { top: 83%; left: 31%; }
+.num-8  { top: 69%; left: 17%; }
+.num-9  { top: 50%; left: 12%; }
+.num-10 { top: 31%; left: 17%; }
+.num-11 { top: 17%; left: 31%; }
+
+.large-clock-hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: bottom center;
+  border-radius: 4px;
+}
+
+.large-clock-hand.large-hour {
+  width: 6px;
+  height: 70px;
+  background: var(--text-primary);
+  margin-left: -3px;
+  z-index: 3;
+}
+
+.large-clock-hand.large-minute {
+  width: 4px;
+  height: 100px;
+  background: var(--accent-color);
+  margin-left: -2px;
+  z-index: 4;
+}
+
+.large-clock-hand.large-second {
+  width: 2px;
+  height: 115px;
+  background: var(--deco-color-2);
+  margin-left: -1px;
+  z-index: 5;
+}
+
+.large-clock-center-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--accent-color);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+}
+
+.large-clock-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.large-digital-display {
+  font-family: var(--font-timer);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--timer-color);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.large-date-display {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 /* Main Content Area */
@@ -630,6 +969,8 @@ body.fullscreen-mode {
 /* Hide header, tabs, footer mini-stats, and layout banners in fullscreen */
 body.fullscreen-mode .app-header,
 body.fullscreen-mode .mode-switcher-container,
+body.fullscreen-mode .exam-presets-bar,
+body.fullscreen-mode .prominent-stats-cards,
 body.fullscreen-mode .mini-stats-bar,
 body.fullscreen-mode .layout-mode-banner {
   display: none !important;
@@ -1551,6 +1892,61 @@ body.fullscreen-mode .btn-fullscreen-floating-exit:hover {
 
   .settings-content-area {
     padding: 16px 14px;
+  }
+
+  /* Prominent Stats on Mobile */
+  .prominent-stats-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .prominent-stat-card {
+    padding: 16px 18px;
+    border-radius: 18px;
+  }
+
+  .prominent-stat-icon-wrap {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+
+  .prominent-stat-number {
+    font-size: 24px !important;
+  }
+
+  /* Exam Presets on Mobile */
+  .exam-presets-bar {
+    gap: 6px;
+  }
+
+  .exam-chip-btn {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 130px;
+    padding: 6px 10px;
+  }
+
+  /* Large Clock Dial on Mobile */
+  .large-analog-dial {
+    width: 230px;
+    height: 230px;
+  }
+
+  .large-clock-hand.large-hour {
+    height: 52px;
+  }
+
+  .large-clock-hand.large-minute {
+    height: 75px;
+  }
+
+  .large-clock-hand.large-second {
+    height: 90px;
+  }
+
+  .large-digital-display {
+    font-size: 26px;
   }
 
   /* Hide corner branches on narrow screens so it stays clean */

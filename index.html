@@ -40,13 +40,24 @@
         </div>
         <div class="brand-text-wrap">
           <span id="app-title-display" class="app-title" style="display:none;"></span>
-          <span id="app-subtitle-display" class="app-subtitle">ALES Çalışma Alanı</span>
+          <span id="app-subtitle-display" class="app-subtitle">Kişisel Sınav & Çalışma Alanı</span>
         </div>
       </div>
 
       <!-- Live Clock & Date Section -->
       <div id="header-time-date" class="header-clock-date" data-draggable-widget="clock-date">
-        <div class="live-clock">
+        <!-- Interactive Mini Analog Clock -->
+        <div id="mini-analog-clock-wrap" class="mini-analog-clock-wrap" title="Analog Saati Büyüt (Tıkla)">
+          <div class="mini-analog-dial">
+            <div class="mini-clock-hand mini-hour" id="mini-clock-hour"></div>
+            <div class="mini-clock-hand mini-minute" id="mini-clock-minute"></div>
+            <div class="mini-clock-hand mini-second" id="mini-clock-second"></div>
+            <div class="mini-clock-center-dot"></div>
+          </div>
+          <span class="mini-clock-zoom-hint" title="Büyüt">🔍</span>
+        </div>
+
+        <div class="live-clock" id="live-clock-container" title="Büyütmek için tıkla" style="cursor: pointer;">
           <svg class="clock-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
@@ -104,9 +115,42 @@
           <span>⏱️ Normal Kronometre</span>
         </button>
         <button id="tab-mode-ales" class="mode-tab-btn">
-          <span>🎯 ALES Modu (150 dk)</span>
+          <span>🎯 Sınav Modları</span>
         </button>
       </div>
+    </div>
+
+    <!-- Exam Presets Selection Bar (Visible when Sınav Modları is active) -->
+    <div id="exam-presets-bar" class="exam-presets-bar" style="display: none;">
+      <button class="exam-chip-btn active" data-preset="ales-150" title="ALES Sınavı (150 dk - 100 soru)">
+        <span class="chip-title">🎓 ALES</span>
+        <span class="chip-duration">150 dk</span>
+        <span class="chip-sub">100 Soru</span>
+      </button>
+
+      <button class="exam-chip-btn" data-preset="hakim-all-130" title="Hâkim ve Savcı Yardımcılığı (Tüm Sınav - 130 dk - 100 soru)">
+        <span class="chip-title">⚖️ Hâkim/Savcı (Tüm)</span>
+        <span class="chip-duration">130 dk</span>
+        <span class="chip-sub">100 Soru (Tek Oturum)</span>
+      </button>
+
+      <button class="exam-chip-btn" data-preset="hakim-part1-80" title="Hâkim/Savcı 1. Oturum: Ortak Alan (80 dk - 65 soru)">
+        <span class="chip-title">📜 1. Oturum (Ortak Alan)</span>
+        <span class="chip-duration">80 dk</span>
+        <span class="chip-sub">65 Soru</span>
+      </button>
+
+      <button class="exam-chip-btn" data-preset="hakim-part2-50" title="Hâkim/Savcı 2. Oturum: Alan Testi (50 dk - 35 soru)">
+        <span class="chip-title">⚖️ 2. Oturum (Alan Testi)</span>
+        <span class="chip-duration">50 dk</span>
+        <span class="chip-sub">35 Soru</span>
+      </button>
+
+      <button class="exam-chip-btn" data-preset="custom" title="Özel Sınav Süresi">
+        <span class="chip-title">⚙️ Özel Süre</span>
+        <span class="chip-duration" id="chip-custom-duration-text">90 dk</span>
+        <span class="chip-sub">Kullanıcı Tanımlı</span>
+      </button>
     </div>
 
     <!-- Main Content Area -->
@@ -132,7 +176,7 @@
         </div>
 
         <div id="timer-target-tag" class="timer-target-tag" style="display: none;">
-          Hedef: 150 Dakika (2 sa 30 dk)
+          Hedef: 150 Dakika (100 Soru)
         </div>
 
         <!-- Timer Control Buttons -->
@@ -178,6 +222,27 @@
         </button>
       </div>
 
+      <!-- Prominent Daily & Weekly Study Time Cards (Büyük Görünüm) -->
+      <div id="prominent-stats-cards" class="prominent-stats-cards" data-draggable-widget="prominent-stats">
+        <div class="prominent-stat-card today-stat-card">
+          <div class="prominent-stat-icon-wrap">📅</div>
+          <div class="prominent-stat-content">
+            <span class="prominent-stat-label">Bugünkü Toplam Çalışma</span>
+            <div class="prominent-stat-number" id="prominent-stat-today">0 sa 0 dk</div>
+            <span class="prominent-stat-badge" id="prominent-stat-today-sessions">0 oturum tamamlandı</span>
+          </div>
+        </div>
+
+        <div class="prominent-stat-card weekly-stat-card">
+          <div class="prominent-stat-icon-wrap">🌱</div>
+          <div class="prominent-stat-content">
+            <span class="prominent-stat-label">Bu Haftaki Toplam Çalışma</span>
+            <div class="prominent-stat-number" id="prominent-stat-weekly">0 sa 0 dk</div>
+            <span class="prominent-stat-badge" id="prominent-stat-weekly-days">Son 7 günlük birikim</span>
+          </div>
+        </div>
+      </div>
+
     </main>
 
     <!-- Mini Stats Bar (Always on main screen) -->
@@ -201,6 +266,55 @@
       </div>
     </footer>
 
+  </div>
+
+  <!-- Large Analog Clock Modal (Büyütülmüş Analog Saat) -->
+  <div id="analog-clock-modal" class="modal-overlay">
+    <div class="modal-card analog-modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span style="font-size: 24px;">🕰️</span>
+          <h2 class="modal-title">Canlı Analog Saat</h2>
+        </div>
+        <button id="btn-close-analog-modal" class="modal-close-btn" title="Küçült / Kapat (ESC)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="analog-modal-content">
+        <div class="large-clock-dial-container">
+          <div class="large-analog-dial">
+            <!-- Hour Markers -->
+            <span class="clock-num num-12">12</span>
+            <span class="clock-num num-1">1</span>
+            <span class="clock-num num-2">2</span>
+            <span class="clock-num num-3">3</span>
+            <span class="clock-num num-4">4</span>
+            <span class="clock-num num-5">5</span>
+            <span class="clock-num num-6">6</span>
+            <span class="clock-num num-7">7</span>
+            <span class="clock-num num-8">8</span>
+            <span class="clock-num num-9">9</span>
+            <span class="clock-num num-10">10</span>
+            <span class="clock-num num-11">11</span>
+
+            <!-- Hands -->
+            <div class="large-clock-hand large-hour" id="large-clock-hour"></div>
+            <div class="large-clock-hand large-minute" id="large-clock-minute"></div>
+            <div class="large-clock-hand large-second" id="large-clock-second"></div>
+            <div class="large-clock-center-dot"></div>
+          </div>
+        </div>
+
+        <div class="large-clock-info">
+          <div id="large-clock-digital-time" class="large-digital-display">00:00:00</div>
+          <div id="large-clock-digital-date" class="large-date-display">23 Kasım 2026, Pazartesi</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Settings & Customization Drawer/Modal -->
@@ -276,20 +390,21 @@
             <div id="font-sizes-container"></div>
           </div>
 
-          <!-- 5. Kronometre & ALES -->
+          <!-- 5. Kronometre & Sınav Modları -->
           <div id="tab-ales" class="settings-pane">
-            <h3 class="settings-section-title">ALES ve Kronometre Seçenekleri</h3>
-            <p class="settings-section-desc">Sınav deneme sürelerini, sesli uyarıları ve tam ekran davranışını özelleştir.</p>
+            <h3 class="settings-section-title">Sınav Modları ve Kronometre Seçenekleri</h3>
+            <p class="settings-section-desc">ALES, Hâkim-Savcı Yardımcılığı veya serbest çalışma sürelerini ve sesli uyarıları belirle.</p>
 
             <div class="setting-row-control">
-              <label class="setting-row-label">ALES Modu Deneme Süresi</label>
+              <label class="setting-row-label">Hazır Sınav Süresi Seçimi</label>
               <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                <button class="palette-preset-pill btn-ales-preset" data-minutes="150">🎯 150 dk (Standart ALES)</button>
-                <button class="palette-preset-pill btn-ales-preset" data-minutes="120">⏱️ 120 dk (2 Saat)</button>
-                <button class="palette-preset-pill btn-ales-preset" data-minutes="90">⏱️ 90 dk (1.5 Saat)</button>
+                <button class="palette-preset-pill btn-ales-preset" data-minutes="150" data-preset="ales-150">🎓 150 dk (ALES - 100 Soru)</button>
+                <button class="palette-preset-pill btn-ales-preset" data-minutes="130" data-preset="hakim-all-130">⚖️ 130 dk (Hâkim/Savcı Tüm - 100 Soru)</button>
+                <button class="palette-preset-pill btn-ales-preset" data-minutes="80" data-preset="hakim-part1-80">📜 80 dk (Ortak Alan - 65 Soru)</button>
+                <button class="palette-preset-pill btn-ales-preset" data-minutes="50" data-preset="hakim-part2-50">⚖️ 50 dk (Alan Testi - 35 Soru)</button>
               </div>
               <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 13px; font-weight: 600;">Özel Süre (dakika):</span>
+                <span style="font-size: 13px; font-weight: 600;">Özel Sınav Süresi (dakika):</span>
                 <input type="number" id="input-custom-ales-min" class="text-input" style="width: 100px;" min="1" max="600" value="150">
               </div>
             </div>
@@ -297,7 +412,7 @@
             <div class="switch-row">
               <div class="switch-label-wrap">
                 <span class="switch-title">Süre Bittiğinde Sesli Melodi Çal</span>
-                <span class="switch-subtitle">ALES süresi dolduğunda huzurlu bir arp melodisi çalar</span>
+                <span class="switch-subtitle">Sınav süresi dolduğunda huzurlu bir arp melodisi çalar</span>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" id="toggle-sound-chime" checked>
